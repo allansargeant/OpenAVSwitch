@@ -1,0 +1,16 @@
+# Vivado / Xilinx build artifacts
+*.jou
+*.log
+*.str
+.Xil/
+*.cache/
+*.hw/
+*.ip_user_files/
+*.runs/
+*.sim/
+*.gen/
+vivado*.jou
+vivado*.log
+
+# OS
+.DS_Store
