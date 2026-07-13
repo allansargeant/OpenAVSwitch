@@ -35,35 +35,67 @@ full 8 GTH pairs **plus 59 LVDS pairs** for expansion. Same 2-port cap if
 using direct-GTH HDMI, but the 59 LVDS pairs are the interesting part —
 see below.
 
-## How to actually reach 4 inputs: chip-based receivers, not raw GTH
+## Superseded: chip-based HDMI receivers ruled out
 
-Two ways to add an HDMI input to a Zynq UltraScale+ design:
+An earlier version of this doc recommended offloading 2-3 of the 4 HDMI
+inputs to chip-based receivers (Lontium LT6911UXC / Toshiba TC358870,
+HDMI-to-MIPI-CSI-2) specifically to save GTH budget. **That's now ruled
+out**: those chips are built for consumer CEA-861 compliance and can't be
+trusted with the arbitrary custom timings/refresh rates this project
+needs to support (see architecture.md's new "HDMI capture must be
+native" section). All 4 HDMI inputs plus the output need direct-GTH
+capture via Xilinx's HDMI Subsystem IP in its custom-timing / Native
+Video Interface mode. This is the right call for the requirement, but it
+makes the transceiver budget much tighter — worked out below.
 
-1. **Direct-GTH** (Xilinx HDMI Subsystem IP): simplest logic, but costs 3
-   scarce GTH channels per port — caps out around 2-3 total ports on
-   either board above.
-2. **Receiver-chip-based**: an HDMI receiver IC on the daughtercard does
-   its own TMDS-rate clock/data recovery and hands off decoded video to
-   the host FPGA over ordinary high-speed parallel/LVDS I/O or MIPI
-   CSI-2 — consuming *zero* GTH budget. This is exactly what
-   `docs/io-card-spec.md`'s "already-deserialized data" case anticipated,
-   now with a concrete reason it matters (GTH scarcity) rather than just
-   "some cards might work this way."
+## Recalculated GTH budget: native HDMI in+out doesn't fit on one eval board
 
-Confirmed parts along this path: **Lontium LT6911UXC** and **Toshiba
-TC358870** both do HDMI-to-MIPI-CSI-2 at 4K, and the XCZU7EV specifically
-supports "dual 4Kp60 MIPI connectivity" via a soft MIPI CSI-2 RX
-Subsystem IP — a vendor-intended pairing, not a stretch. Z7-P's FMC HPC
-explicitly breaking out 59 LVDS pairs (far more than the 8 GTH pairs)
-reads as designed with exactly this kind of card in mind.
+Direct-GTH HDMI costs 3 GTH channels per port, in **or** out. 4 native
+inputs + 1 native output = **15 GTH channels**, before spending anything
+on PCIe, Ethernet, or other control-plane I/O.
 
-**This changes the Phase 1 hardware plan**: reaching 4 real HDMI inputs
-on one board should target chip-based (MIPI-CSI-2 or LVDS) receiver
-daughtercards for at least 2-3 of the 4 channels, reserving direct-GTH
-for at most 1-2 ports, rather than assuming all 4 can be naive
-direct-GTH. This should also be revisited when Phase 3's daughtercard
-spec gets formalized — it's a stronger argument for the FMC+chip
-approach than io-card-spec.md currently makes.
+- **AMD ZCU106** (20 total GTH): onboard HDMI already gives 1 native
+  in + 1 native out "for free" (3 GTH, already wired to actual HDMI
+  connectors). That leaves 3 more native inputs needed = 9 GTH, but only
+  FMC HPC0's 8 lanes are realistically available (HPC1's lone 1 lane
+  can't host a 3-lane port by itself) — **1 GTH lane short.**
+- **ALINX Z7-P** (also 20 total GTH, XCZU7EV): no onboard HDMI, single
+  FMC HPC exposes exactly 8 GTH total — nowhere near the 15 needed for
+  all 5 native ports, and its onboard PCIe Gen3 x8 alone already accounts
+  for 8 of the chip's 20 GTH.
+- **Bigger same-family chips don't help**: XCZU9EG/XCZU11EG/XCZU15EG
+  (larger logic, "EG" not "EV") actually have *fewer* GTH transceivers
+  (16) than our XCZU7EV (20). The EV suffix is the video-optimized
+  variant for this product line — going bigger within Zynq UltraScale+
+  MPSoC doesn't trivially buy more transceiver budget.
+
+**Bottom line: 4 native HDMI inputs + 1 native HDMI output do not fit on
+a single off-the-shelf ZCU106 or Z7-P's exposed transceiver budget.**
+This isn't a board-picking problem, it's a real resource ceiling. Three
+realistic ways forward:
+
+1. **Stage it**: build Phase 1 with fewer simultaneous native inputs
+   first (e.g. 2 in + 1 out = 9 GTH, comfortably fits either board today)
+   and grow to 4 via a second board/FMC slot later. This mirrors how the
+   logic/simulation track already proved the pipeline shape before
+   scaling channel count, and arguably previews the real product's
+   card-cage model better than a single monolithic board would anyway —
+   each board becomes a natural stand-in for a future chassis slot.
+2. **Move to a transceiver-richer device family**: Kintex/Virtex
+   UltraScale+ or RFSoC/Versal parts have far more GTH/GTY channels, but
+   Kintex/Virtex UltraScale+ have no hard Arm PS (would need a softcore
+   or companion SoC for the control plane), and RFSoC/Versal are a
+   significant cost and complexity step up. Not researched in depth yet
+   — would need its own pass if this path is chosen.
+3. **Custom PCB from day one**: design a board around a Zynq UltraScale+
+   EV-class chip with (nearly) all 20 GTH allocated to video I/O instead
+   of an eval board's fixed PCIe/SFP+/SDI/SMA allocations. Most
+   "correct" for the eventual real product, but a much bigger and slower
+   undertaking (schematic, layout, fab, assembly, bring-up) than buying
+   an eval board — a real scope decision, not a default.
+
+Not deciding between these here — flagging for a decision, since each
+has real cost/schedule consequences.
 
 ## Board options found
 
@@ -75,13 +107,18 @@ approach than io-card-spec.md currently makes.
 
 **ALINX FH1159**: an existing commercial FMC HPC card advertised as 1x
 HDMI in + 1x HDMI out, up to 4K60. Its exact receive path (direct-GTH vs
-chip-based) is still **not confirmed** despite a real effort: ALINX's own
+chip-based) was never confirmed despite a real effort: ALINX's own
 product page returns no fetchable content (JS-rendered), a reseller page
 403'd, and the community GitHub schematic mirror
 ([fpgauk/pdf](https://github.com/fpgauk/pdf)) doesn't have an fh1159
 folder — it has fh1219, fh1223, fh1224, fh1402, fh7000, fh7621, fh9000,
-fh9712, but not fh1159. **Action item: get the actual FH1159 datasheet
-before ordering anything.**
+fh9712, but not fh1159. **No longer an action item** — now that
+chip-based HDMI receivers are ruled out (see below), FH1159 is only
+useful to us if it turns out to be a direct-GTH passthrough card, and
+even then it would need to actually expose a custom-timing-capable path,
+which a commercial "plug and play" module isn't obviously designed for.
+Not pursuing further unless a native-timing-capable HDMI FMC card
+surfaces from somewhere.
 
 One correction from an earlier research pass: an AI-summarized web search
 had suggested the FH1159 uses an Analog Devices ADV7611. That doesn't
@@ -116,38 +153,43 @@ a decision rather than deciding it here.
 
 ## Recommendation
 
-Prototype on **ALINX Z7-P** rather than AMD's own ZCU106: same XCZU7EV
-chip (so nothing about the RTL/architecture work changes), ~2.5x cheaper,
-and its connector layout (all 8 GTH + 59 LVDS pairs on one FMC HPC,
-nothing spent on onboard HDMI) is arguably better suited to a
-multi-input, chip-based-receiver design than ZCU106's, which pre-spends
-3 GTH channels on a single onboard HDMI port we may not even use as one
-of our 4 inputs. Trade-off: less official Xilinx/community reference
-material than a genuine AMD eval board — worth it for a hobby/community
-project on cost grounds, but flagging so it's a conscious choice, not a
-default.
+Given native (direct-GTH) capture is a hard requirement and 4-in+1-out
+doesn't fit one eval board's transceiver budget, the recommended path is
+**stage it**: start with **AMD ZCU106** for the first real-hardware
+milestone specifically *because* its onboard HDMI (3 dedicated GTH,
+already wired to real connectors) gives 1 native input + 1 native output
+"for free," with zero board-bring-up risk on that pair — the fastest
+route to a first native-capture-and-display proof. Add 2 more native
+inputs via FMC HPC0 (6 of its 8 GTH lanes) once that's working, reaching
+3 native inputs + 1 native output on a single ZCU106 (falls 1 GTH lane
+short of the full 4-in goal, per the budget above). The 4th input is a
+second board/FMC slot, deferred rather than blocking the rest of Phase 1.
 
-If community reference designs / AMD support turn out to matter more
-than the ~$3,200 price difference, ZCU106 remains a fine fallback — nothing
-here rules it out, it's just tighter on ports.
+This reverses the earlier Z7-P recommendation (which was made when
+chip-based receivers were still on the table and Z7-P's cost/LVDS
+advantage mattered more) — ZCU106's onboard HDMI is now a genuine
+advantage rather than "3 GTH we might not use," since we need every
+native HDMI port we can get and ZCU106's are already built and proven.
+Z7-P remains a fine choice for the 2nd-board / 4th-input expansion later
+if cost matters more than reusing an identical onboard HDMI reference.
+
+**Not decided, needs your input:** whether to accept the staged
+(3-in-then-later-4th) path, or invest upfront in a transceiver-richer
+device or custom PCB (options 2/3 above) to hit all 4 native inputs on
+one board from the start. The staged path is cheaper and faster to a
+working proof; the other two are more "final architecture" but
+substantially more expensive/slower.
 
 ## Open items before ordering anything
 
-- Confirm FH1159's actual receive path (direct-GTH vs on-card chip) from
-  ALINX's datasheet, not just the product page summary — still
-  unresolved after a real effort (see above).
+- **Decide the staging question above** — this is the main open decision
+  now, more than any specific part number.
 - **Decide HDMI-only vs adding/leading with SDI.** The FH1219 find above
   is a real strategic fork, not a footnote: SDI is ~3x more
-  transceiver-efficient per channel and is what real Aquilon/E3-class
-  hardware actually uses. Staying HDMI-only is simpler (matches the
-  original ask, no new receiver-chip integration work) but SDI may be
-  worth it if genlock/cable-reach matters as much as the vision docs
-  suggest it should eventually.
-- Decide the real Phase 1 input mix: e.g. 1-2 direct-GTH ports (simplest
-  RTL, reuses Xilinx's subsystem IP almost as-is) + 2-3 chip-based ports
-  (LT6911UXC/TC358870 class, needs a MIPI CSI-2 RX Subsystem integration
-  we haven't built yet) — or start with fewer than 4 real inputs first
-  and grow, mirroring how the logic/simulation track proved the pipeline
-  shape before scaling channel count.
+  transceiver-efficient per channel (chip-based receivers are fine for
+  it, unlike HDMI) and is what real Aquilon/E3-class hardware actually
+  uses. Staying HDMI-only is simpler (matches the original ask) but SDI
+  may be worth it given how much genlock/cable-reach matters to this
+  project's goals.
 - No purchase has been made. This doc is the basis for a decision, not a
   confirmation of one.

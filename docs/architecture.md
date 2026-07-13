@@ -81,6 +81,36 @@ either a bigger/second device or a fundamentally different memory
 architecture (e.g. splitting channels across multiple DDR controllers or
 devices), not just "the same design, faster."
 
+## HDMI capture must be native (direct-GTH), not chip-based
+
+Decision (2026-07-13): HDMI inputs and the output must support arbitrary
+custom timings and refresh rates, not just standard CEA-861/SMPTE
+formats. This isn't a nice-to-have — it's the same reason MiSTer itself
+has to deal with things like 15kHz and other non-standard rates from
+original/retro hardware, and it rules out the "chip-based receiver"
+approach for HDMI specifically.
+
+Fixed-function HDMI receiver/bridge chips (e.g. Lontium LT6911-class
+HDMI-to-MIPI parts) are built for consumer CEA-861 compliance and can't
+be trusted to lock onto or pass through arbitrary non-standard sync
+patterns. So HDMI capture and output use **direct-GTH** instead: Xilinx's
+HDMI RX/TX Subsystem IP has a "Native Video Interface" / custom-timing
+mode (with a self-written video timing controller instead of the
+standard one) specifically for this — confirmed capable, not a stretch.
+
+This is a real cost, not a free choice: direct-GTH costs 3 GTH
+transceiver channels per HDMI port (in or out), and that transceiver
+budget turns out to be the actual limiter on how many native HDMI ports
+fit on a single board — see
+[hardware-selection.md](hardware-selection.md) for the math and its
+consequences for board/phase planning.
+
+**SDI is exempt from this constraint.** SDI is already tightly
+standardized (SMPTE), so a chip-based receiver (e.g. Semtech GS12190,
+~1 GTH lane/channel vs HDMI's 3) is fine there — "capture must be native"
+is specifically an HDMI/custom-format concern, not a blanket rule against
+all receiver chips.
+
 ## Modularity: I/O daughtercards
 
 Long-term goal is a card-cage model: a host/control card plus pluggable

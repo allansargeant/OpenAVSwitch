@@ -5,18 +5,29 @@ fixed reference instead of re-deciding things per module.
 
 ## Target hardware (real board, later)
 
-Researched and recommended (not yet purchased) in
-[hardware-selection.md](hardware-selection.md): **ALINX Z7-P**
-(XCZU7EV Zynq UltraScale+, same chip family as originally proposed,
-~2.5x cheaper than AMD's own ZCU106) + HDMI-capable FMC card(s) for the
-4 inputs and 1 output. Key refinement over the original proposal: GTH
-transceiver budget, not compute/DDR bandwidth, turns out to be the real
-constraint on reaching 4 simultaneous HDMI inputs, so the real design
-likely mixes a couple of direct-GTH ports with a couple of chip-based
-(MIPI-CSI-2) receiver ports rather than 4 identical direct-GTH ports —
-see hardware-selection.md for why. Still not purchased — nothing in the
-RTL below depends on this choice, deliberately, so hardware selection
-doesn't block logic-level work.
+Researched, not yet purchased — see [hardware-selection.md](hardware-selection.md)
+for the full reasoning, which has evolved twice already:
+
+1. First pass proposed ZCU106-class + generic HDMI FMC mezzanines.
+2. Second pass found GTH transceiver budget, not compute/DDR bandwidth,
+   is the real constraint, and initially suggested offloading some
+   inputs to chip-based (MIPI-CSI-2) HDMI receivers to save GTH budget.
+3. **Current (superseding #2)**: HDMI capture must support arbitrary
+   custom timings/refresh rates (see architecture.md), which rules out
+   chip-based receivers for HDMI entirely — they're built for consumer
+   CEA-861 compliance. All HDMI ports must be direct-GTH. At 3 GTH
+   channels per port, **4 native HDMI inputs + 1 native output (15 GTH)
+   does not fit on a single ZCU106 or Z7-P's exposed transceiver
+   budget** — recommended path is to stage it: prototype on **AMD
+   ZCU106** (its onboard HDMI gives 1 native in + 1 native out for free,
+   then FMC HPC0 adds 2 more native inputs = 3 of 4 total), with the 4th
+   input coming from a second board/FMC slot later rather than blocking
+   on it.
+
+Still not purchased, and the staging question is an open decision (see
+hardware-selection.md) — nothing in the RTL below depends on this
+choice, deliberately, so hardware selection doesn't block logic-level
+work.
 
 ## What Phase 1 actually proves
 
