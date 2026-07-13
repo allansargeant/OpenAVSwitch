@@ -8,7 +8,7 @@
 		(title "OpenAVSwitch Carrier Board - Top Level")
 		(company "OpenAVSwitch")
 		(comment 1 "SOM+carrier for Trenz TE0807 (XCZU7EV) -- see docs/carrier-board-spec.md")
-		(comment 2 "3 native in + 1 native out fit (1 quad each, no sharing); 4th input needs a decision")
+		(comment 2 "3 native HDMI in + 1 native out, 1 GTH quad each, no sharing. 4th input on a 2nd board.")
 	)
 	(lib_symbols)
 	(sheet
@@ -235,45 +235,6 @@
 		)
 		(property "Sheetfile" "hdmi_in1.kicad_sch"
 			(at 20 84 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left top)
-			)
-		)
-	)
-	(sheet
-		(at 20 120)
-		(size 25.4 12.7)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(stroke
-			(width 0.1524)
-			(type solid)
-		)
-		(fill
-			(color 0 0 0 0)
-		)
-		(uuid "ae56b276-5680-4474-94d2-f93410a31c07")
-		(property "Sheetname" "HDMI Input 4"
-			(at 20 119 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left bottom)
-			)
-		)
-		(property "Sheetfile" "hdmi_in4.kicad_sch"
-			(at 20 134 0)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects

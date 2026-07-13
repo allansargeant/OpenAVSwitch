@@ -22,8 +22,16 @@ Confirmed directly from Trenz's own [TE0807 TRM](https://wiki.trenz-electronic.d
   pre-spends transceivers on its own onboard peripherals (PCIe, SFP+,
   etc.); a bare SOM spends none, leaving the full budget for us.
 - 4x B2B connectors (J1-J4), "Razor Beam LP Slim Terminal Strip," 0.5mm
-  pitch, 160 contacts each (Samtec-class — exact Samtec part number and
-  KiCad footprint still needed, see open items).
+  pitch, 160 contacts each. **Exact part numbers found and confirmed**
+  (Trenz's own dedicated ["5.2 x 7.6 SoM ST5 and SS5 B2B Connectors"](https://wiki.trenz-electronic.de/display/PD/5.2+x+7.6+SoM+ST5+and+SS5+B2B+Connectors)
+  page, cross-referenced against Samtec's catalog): module side (already
+  populated on TE0807) is Samtec **ST5** series, Trenz ref REF-192552-02;
+  the carrier-side mating socket we need to place is Samtec
+  **SS5-80-3.50-L-D-K-TR** (Trenz ref REF-192552-01) — 80 positions/row,
+  dual row = 160 contacts, 3.5mm stack height. KiCad footprint + symbol
+  + 3D model available for this exact part from both the official KiCad
+  footprint library ([KiCad/Connectors_Samtec.pretty](https://github.com/KiCad/Connectors_Samtec.pretty))
+  and SnapEDA — no need to hand-build one. Need 4 of these (J1-J4).
 - Same XCZU7EV chip already used in prior research, so the "native HDMI
   needs direct-GTH" reasoning and 3-GTH-per-port cost from
   hardware-selection.md carries over unchanged.
@@ -151,17 +159,25 @@ Ethernet PHY on RGMII from the PS, no PCIe on this board rev.
 - HDMI connector-side circuitry per port: AC-coupling caps on the 3 TMDS
   data pairs, ESD protection, 5V-tolerant level shifting for
   HPD/CEC/DDC, EDID emulation (EEPROM or FPGA-driven) per input.
-- Reference clock generation: each of the 3 native inputs and the 1
-  native output needs its own independently-programmable clock
-  synthesizer (e.g. Si5341/Si5345 class) feeding its own quad's
-  reference pins — 4 independent synthesizer outputs, one per quad, no
-  sharing between them (per the corrected conclusion above). Part
-  selection not done yet.
+- **Reference clock generation — part selected**: one **Silicon Labs
+  Si5341A** (10-output, any-frequency clock generator, ~$18) feeds all 4
+  quads' reference pins from its 10 independent outputs — no sharing
+  between them, 6 outputs spare for future use (e.g. a genlock/reference
+  distribution output to the second carrier board or future
+  daughtercards, per io-card-spec.md's genlock requirement). Well-suited
+  on paper: Silicon Labs explicitly references this part in their own
+  timing reference designs for Kintex/Virtex UltraScale GTH transceiver
+  applications, differential output range 100Hz-1028MHz (comfortably
+  covers the reference frequencies GTH's CPLL needs), and 0.001 ppb
+  tuning resolution — effectively continuous, not discretely stepped
+  like the CPLL's own ratios, so it can compensate for whatever exact
+  reference the CPLL math needs for a given arbitrary target rate.
+  Configured over I2C/SPI with Silicon Labs' ClockBuilder Pro tool. Not
+  yet validated against real hardware — the usual caveat about
+  architecture-level research vs. bring-up measurement applies here too.
 - Power: TE0807 needs specific input rail(s) per its TRM (not
   transcribed here yet) — carrier needs its own regulation for HDMI
   connector-side logic (3.3V/5V) on top of whatever the module needs.
-- Exact Samtec B2B connector part number + KiCad footprint/symbol for
-  the 4x160-contact 0.5mm-pitch connectors.
 - Explicit **no-HDCP** stance: not implementing HDCP (licensing/legal
   scope, consistent with MiSTer's own position) — protected/encrypted
   HDMI sources will not display. Worth stating plainly in end-user docs
@@ -169,14 +185,11 @@ Ethernet PHY on RGMII from the PS, no PCIe on this board rev.
 
 ## Open items before ordering the SOM or starting schematic capture
 
-- Get the exact Samtec B2B connector part number from Trenz (for KiCad
-  footprint sourcing).
-- Decide the reference clock synthesizer part (4 independent outputs
-  needed, one per quad — simpler now that there's no cross-quad sharing
-  to design around).
 - Confirm the GTH allocation above at the Vivado pin-planner level once
   schematic capture starts, as a final sanity check on this
   architecture-level analysis — not expected to change the outcome, but
   worth doing before pins are committed to copper.
+- HDMI connector-side circuitry (AC-coupling, ESD, level shifting, EDID)
+  and power rail design still need doing — see "Not yet designed" above.
 - No SOM purchase has been made yet. This doc is the basis for a
   decision, not a confirmation of one.
