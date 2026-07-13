@@ -1,9 +1,13 @@
 # Carrier board spec (SOM + custom carrier)
 
 Status: draft, pre-schematic. Captures the SOM choice and the GTH
-transceiver budget/mapping. The cross-quad clocking question that
-blocked pin assignment is now resolved (see below) — full 4-in+1-out
-native HDMI fits on the Trenz TE0807's 16 GTH lanes.
+transceiver budget/mapping. **Correction from an earlier version of this
+doc**: a previous pass concluded 4-in+1-out native HDMI fits cleanly on
+TE0807's 16 GTH by having HDMI OUT borrow lanes across quads. That
+conclusion was wrong in an important way — see "Corrected conclusion"
+below. Current answer: **3 fully-independent native inputs + 1
+fully-independent native output fit cleanly; the 4th input needs either
+a compromise or a second board.**
 
 ## SOM choice: Trenz TE0807 (recommended)
 
@@ -72,58 +76,72 @@ architecture. Key facts, quoted/paraphrased from UG578 v1.3 Chapter 2
   X0Y4-7, X0Y8-11, X0Y12-15) — i.e. already adjacent in exactly the
   order needed for north/south relay between neighbors.
 
-**What this means for the 5th port**: source one reference clock
-locally in quad 225 (its own dedicated `GTREFCLK0`/`1` pins), and relay
-it one hop south into 224 and one hop north into 226 via
-`GTSOUTHREFCLK`/`GTNORTHREFCLK`. That's 1 of the 2 available tracks
-used at each of the two quad boundaries involved — nowhere near the
-budget ceiling. The output port's 3 TMDS lanes can then be built from
-one spare lane each in quads 224, 225, and 226, all frequency-coherent
-because they share the one physical reference clock. Quad 227's spare
-lane isn't needed for this and stays free.
+**What the earlier pass got wrong**: it treated "HDMI OUT borrows a lane
+from quad 225" as giving OUT its own independent rate, since each lane
+has its own per-channel CPLL. That's true in isolation, but it missed
+what the CPLL can actually *do* with a shared reference. Worked out the
+math (UG576 Equation 2-1/2-2, Table 2-11): CPLL output = f_ref x
+(N1 x N2 / M), line rate = CPLL output x 2 / D, with N1 in {4,5}, N2 in
+{1..5}, M in {1,2}, D in {1,2,4,8}. Enumerating every combination gives
+only **29 distinct discrete ratios** between line rate and reference
+frequency — not a continuum. So if quad 225's reference is fixed to
+whatever HDMI IN 2 needs *right now* (a live, continuously-captured
+arbitrary-rate source that must never be disturbed, per architecture.md's
+core "continuous capture" principle), HDMI OUT's achievable rate isn't
+arbitrary — it's restricted to one of those ~29 ratios *times whatever
+IN 2's reference currently is*. If OUT needs to drive some unrelated
+display at a rate that isn't one of those 29 ratios away from IN 2's
+current reference, it simply can't, without retuning the shared
+reference and disturbing IN 2's live capture. That's a real conflict
+with the native/arbitrary-rate requirement for OUT, not a minor caveat.
 
-**Remaining caveats, not blockers**: Xilinx's own guidance notes a
-fully-local reference clock has the best jitter performance, and
-cross-quad sourcing adds a (small, but real) amount of routing — worth
-confirming with an actual eye-diagram measurement during bring-up rather
-than assumed away, especially since native/custom timings already push
-outside the range Xilinx's own IP was validated against. And this
-analysis is architecture-level (from the user guide's general
-description); final confirmation of exact pin-level feasibility for
-*this specific* GTH quad arrangement belongs in Vivado's pin planner
-once schematic capture starts — but there's no remaining reason to
-believe the 4-in+1-out design doesn't fit.
+**The underlying reason, more generally**: cross-quad clock *sharing*
+doesn't create a new independent reference domain — it only extends the
+reach of an *existing* one to more lanes. With 4 physical quads, each
+with its own local reference clock pins, there are at most **4
+independently-and-arbitrarily-tunable reference domains available on
+this SOM, full stop** — no routing trick changes that count. 5
+genuinely independent arbitrary-rate ports need 5 independent reference
+sources, and TE0807 only has 4.
 
-## GTH allocation (unblocked — see resolution above)
+## Corrected conclusion and GTH allocation
+
+**3 fully-independent native ports fit cleanly, one per quad, no
+sharing, no coupling:**
 
 | Quad (bank) | Lanes | Assignment |
 |---|---|---|
-| 224 | 4 | HDMI IN 1 (3 lanes) + 1 lane -> HDMI OUT (shares quad 225's ref clock via GTSOUTHREFCLK) |
-| 225 | 4 | HDMI IN 2 (3 lanes) + 1 lane -> HDMI OUT (local reference clock, relayed to 224 & 226) |
-| 226 | 4 | HDMI IN 3 (3 lanes) + 1 lane -> HDMI OUT (shares quad 225's ref clock via GTNORTHREFCLK) |
-| 227 | 4 | HDMI IN 4 (3 lanes) + 1 spare, unused |
+| 224 | 4 | HDMI IN 1 (3 lanes) + 1 spare, unused |
+| 225 | 4 | HDMI IN 2 (3 lanes) + 1 spare, unused |
+| 226 | 4 | **HDMI OUT** (3 lanes) + 1 spare, unused |
+| 227 | 4 | HDMI IN 3 (3 lanes) + 1 spare, unused |
 | GTR (bank 505) | 4 | Not used for HDMI (see below); reserved/spare |
-| HDMI OUT | 3 (borrowed) | 1 lane each from quads 224, 225, 226 (see above) |
 
 GTR transceivers are *not* used for any HDMI port: their typical ~6Gbps
 ceiling leaves too little margin over 4K60's ~5.94Gbps-per-lane TMDS
 rate. GTH (16.3Gbps-rated) is the safe choice for all video, consistent
 with hardware-selection.md.
 
-**One nuance worth being precise about**: "shares quad 225's reference
-clock" does *not* force HDMI OUT and HDMI IN 2 to run the same line
-rate — each lane normally gets its own per-channel CPLL, which
-multiplies/divides the shared reference independently, so IN 2 and OUT
-can still target different rates. What sharing *does* mean: both are
-constrained to whatever rates are reachable from the *same* base
-reference frequency at any given moment (a CPLL's multiply/divide ratio
-set is discrete, not arbitrary). If IN 2 and OUT both need to hit
-genuinely arbitrary, unrelated custom pixel rates *simultaneously*, the
-reference clock architecture (see "Not yet designed" below) needs to
-account for that coupling — likely by feeding quad 225's shared
-reference from a programmable synthesizer that can retune, rather than
-assuming full independence. Not a blocker, but a real design constraint
-to carry into that step, not an afterthought.
+This gives 3 native inputs + 1 native output, all genuinely
+independent — no rate coupling, no shared-reference conflict. **The 4th
+input doesn't fit on this SOM with full independence, and needs one of:**
+
+1. **Defer it** to a second TE0807/carrier (mirrors the project's own
+   eventual card-cage vision — each board is a natural stand-in for a
+   future chassis slot, consistent with how hardware-selection.md
+   already reasoned about staging).
+2. **Accept the coupling for one input specifically**, if one of the 4
+   inputs can tolerate being rate-constrained relative to another
+   port's reference (e.g. if it's expected to mostly see standard
+   formats rather than truly arbitrary ones) — this reintroduces exactly
+   the kind of compromise the native-capture requirement was meant to
+   rule out, so it's a real trade-off, not a free win.
+3. **Move to a device/board with more independent quads** — noted as an
+   option in hardware-selection.md already (transceiver-richer device
+   family), still not researched in depth.
+
+No default picked here — this is a real decision, flagged for you
+rather than assumed.
 
 ## Control plane: keep it off the GTH budget
 
@@ -139,14 +157,12 @@ Ethernet PHY on RGMII from the PS, no PCIe on this board rev.
 - HDMI connector-side circuitry per port: AC-coupling caps on the 3 TMDS
   data pairs, ESD protection, 5V-tolerant level shifting for
   HPD/CEC/DDC, EDID emulation (EEPROM or FPGA-driven) per input.
-- Reference clock generation: each of the 4 input ports likely needs an
-  independently-programmable clock synthesizer (e.g. Si5341/Si5345
-  class) feeding its quad's reference pins, not a fixed oscillator.
-  Quad 225's synthesizer output also feeds HDMI OUT's borrowed lane (via
-  the cross-quad relay above) — the synthesizer/architecture choice
-  needs to account for the IN2/OUT coupling noted above, not just pick
-  4 independent chips and assume it's fully solved. Part selection not
-  done yet.
+- Reference clock generation: each of the 3 native inputs and the 1
+  native output needs its own independently-programmable clock
+  synthesizer (e.g. Si5341/Si5345 class) feeding its own quad's
+  reference pins — 4 independent synthesizer outputs, one per quad, no
+  sharing between them (per the corrected conclusion above). Part
+  selection not done yet.
 - Power: TE0807 needs specific input rail(s) per its TRM (not
   transcribed here yet) — carrier needs its own regulation for HDMI
   connector-side logic (3.3V/5V) on top of whatever the module needs.
@@ -159,10 +175,14 @@ Ethernet PHY on RGMII from the PS, no PCIe on this board rev.
 
 ## Open items before ordering the SOM or starting schematic capture
 
+- **Decide how to handle the 4th input** (defer to a second board,
+  accept a rate-coupling compromise on one port, or research a
+  transceiver-richer device) — the main open decision now.
 - Get the exact Samtec B2B connector part number from Trenz (for KiCad
   footprint sourcing).
-- Decide the reference clock synthesizer architecture, accounting for
-  the quad-225/HDMI-OUT coupling noted above.
+- Decide the reference clock synthesizer part (4 independent outputs
+  needed, one per quad — simpler now that there's no cross-quad sharing
+  to design around).
 - Confirm the GTH allocation above at the Vivado pin-planner level once
   schematic capture starts, as a final sanity check on this
   architecture-level analysis — not expected to change the outcome, but
