@@ -70,16 +70,49 @@ approach than io-card-spec.md currently makes.
 | Board | Chip | Price (Jul 2026) | HDMI onboard | Expansion | Notes |
 |---|---|---|---|---|---|
 | AMD ZCU106 | XCZU7EV | ~$5,300-5,800 | 1 in + 1 out (3 GTH) | HPC0: 8 GTH; HPC1: 1 GTH | Official AMD board, most reference-design/community support |
-| ALINX Z7-P | XCZU7EV | ~$2,097 | none | 1x FMC HPC: 8 GTH + 59 LVDS | Successor to discontinued AXU7EV; same chip as ZCU106, ~2.5x cheaper |
+| ALINX Z7-P | XCZU7EV | ~$2,097 | none | 1x FMC HPC: 8 GTH + 59 LVDS | Successor to discontinued AXU7EV; same chip as ZCU106, ~2.5x cheaper. Confirmed directly from the [Z7-P User Manual](https://github.com/fpgauk/pdf/raw/main/alinx/z7-p/Z7-P_User_Manual.pdf) (not just a secondary source), which also explicitly lists ALINX's "HDMI input/output module" as a compatible FMC card category |
 | ALINX AXU7EV | XCZU7EV | ~$2,680 (discontinued) | 2x 4K60 HDMI | 1x FMC LPC | Superseded by Z7-P, which moved HDMI off-board onto FMC cards instead |
 
 **ALINX FH1159**: an existing commercial FMC HPC card advertised as 1x
-HDMI in + 1x HDMI out, up to 4K60. Whether it's direct-GTH or
-chip-based (and its exact LVDS/GTH pin usage) wasn't confirmed — their
-product page didn't return fetchable content in this research pass.
-**Action item: get the actual FH1159 datasheet PDF before ordering
-anything**, to confirm which approach it uses and whether 2-3 of them can
-coexist on one Z7-P's single FMC HPC connector.
+HDMI in + 1x HDMI out, up to 4K60. Its exact receive path (direct-GTH vs
+chip-based) is still **not confirmed** despite a real effort: ALINX's own
+product page returns no fetchable content (JS-rendered), a reseller page
+403'd, and the community GitHub schematic mirror
+([fpgauk/pdf](https://github.com/fpgauk/pdf)) doesn't have an fh1159
+folder — it has fh1219, fh1223, fh1224, fh1402, fh7000, fh7621, fh9000,
+fh9712, but not fh1159. **Action item: get the actual FH1159 datasheet
+before ordering anything.**
+
+One correction from an earlier research pass: an AI-summarized web search
+had suggested the FH1159 uses an Analog Devices ADV7611. That doesn't
+hold up — ADV7611's own datasheet caps it at UXGA (1600x1200) at a 165MHz
+TMDS clock, physically incapable of 4K60. That was very likely a
+search-summarization artifact (the search engine's summary conflated
+separate, unrelated results), not a real fact about this card. Treat any
+single-source, unverified part-number claim from search summaries with
+suspicion — cross-check against the part's own datasheet before it goes
+in a BOM.
+
+### Accidental but relevant find: ALINX's 12G-SDI card design (FH1219)
+
+While chasing FH1159, the GitHub mirror had `fh1219`'s schematic instead
+— a different ALINX product, a 4-channel **12G-SDI** FMC card (title:
+"FMC SDI 12G测试板"), not HDMI at all. Worth noting anyway: it uses one
+**Semtech GS12190** SDI reclocking transceiver per channel, each needing
+only **1 GTH-capable serial pair** — a 3x better transceiver budget than
+direct-GTH HDMI's 3 lanes/channel. 4 channels of 12G-SDI fit in 4 GTH
+lanes total, comfortably within Z7-P's or ZCU106 HPC0's 8-lane budget,
+with room to spare.
+
+This is worth raising as an option, not just a curiosity: professional
+live-event switchers (the actual Aquilon/E3 competitive set this project
+is modeled on) predominantly use SDI, not HDMI, specifically for this
+kind of transceiver/cabling efficiency, plus far better cable-reach and
+genlock/reference-sync behavior — all things that matter directly to
+this project's "seamless switching" goal. Whether Phase 1 stays
+HDMI-first, adds SDI as a second input class, or leads with SDI instead
+is a real strategic choice, not something to default into — flagging for
+a decision rather than deciding it here.
 
 ## Recommendation
 
@@ -101,7 +134,15 @@ here rules it out, it's just tighter on ports.
 ## Open items before ordering anything
 
 - Confirm FH1159's actual receive path (direct-GTH vs on-card chip) from
-  ALINX's datasheet, not just the product page summary.
+  ALINX's datasheet, not just the product page summary — still
+  unresolved after a real effort (see above).
+- **Decide HDMI-only vs adding/leading with SDI.** The FH1219 find above
+  is a real strategic fork, not a footnote: SDI is ~3x more
+  transceiver-efficient per channel and is what real Aquilon/E3-class
+  hardware actually uses. Staying HDMI-only is simpler (matches the
+  original ask, no new receiver-chip integration work) but SDI may be
+  worth it if genlock/cable-reach matters as much as the vision docs
+  suggest it should eventually.
 - Decide the real Phase 1 input mix: e.g. 1-2 direct-GTH ports (simplest
   RTL, reuses Xilinx's subsystem IP almost as-is) + 2-3 chip-based ports
   (LT6911UXC/TC358870 class, needs a MIPI CSI-2 RX Subsystem integration
