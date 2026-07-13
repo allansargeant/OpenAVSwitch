@@ -16,5 +16,11 @@ vivado*.log
 *.vvp
 *.vcd
 
+# KiCad local/machine-specific state and backups
+*.kicad_prl
+_autosave-*
+*-backups/
+fp-info-cache
+
 # OS
 .DS_Store

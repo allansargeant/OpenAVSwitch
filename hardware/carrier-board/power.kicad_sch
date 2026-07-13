@@ -1,0 +1,18 @@
+(kicad_sch
+	(version 20260306)
+	(generator "eeschema")
+	(generator_version "10.0")
+	(uuid "2c1d787f-6429-4d57-a7fc-5bc04240dd5a")
+	(paper "A4")
+	(title_block
+		(title "OpenAVSwitch Carrier Board - Power (carrier-side regulation)")
+		(company "OpenAVSwitch")
+		(comment 1 "Stub sheet -- not yet populated, see docs/carrier-board-spec.md")
+	)
+	(lib_symbols)
+	(sheet_instances
+		(path "/"
+			(page "1")
+		)
+	)
+)

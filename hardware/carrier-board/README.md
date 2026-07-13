@@ -1,59 +1,53 @@
-# Carrier board (KiCad project) — not yet started
+# Carrier board (KiCad project)
 
-Status: **KiCad project not created yet.** See why, and what's ready to
-go once it is, below. Design content lives in
+Status: **hierarchical project skeleton created and validated, no
+components placed yet.** Design content lives in
 [../../docs/carrier-board-spec.md](../../docs/carrier-board-spec.md) —
 read that first.
 
-## Why there's no .kicad_pro here yet
+## What's here
 
-Two blockers, one tooling, one technical:
+A hierarchical KiCad 10 project, sheets matching carrier-board-spec.md's
+blocks:
 
-1. **KiCad isn't installed on this machine yet.** `brew install --cask
-   kicad` needs a one-time interactive `sudo` password prompt (to install
-   shared demo files under `/Library/Application Support`), which
-   isn't available in a non-interactive session. Run this yourself in a
-   real terminal:
-   ```
-   brew install --cask kicad
-   ```
-   or download the installer directly from
-   [kicad.org/download](https://www.kicad.org/download/macos/) if you'd
-   rather not use Homebrew.
-2. **The GTH cross-quad clocking question in carrier-board-spec.md is
-   still open.** Real schematic capture (actual GTH pin assignments,
-   connector pinout) shouldn't start until that's resolved — a project
-   built around a wrong assumption there would need its pin mapping
-   redone anyway. Not a reason to avoid setting up the project
-   structure itself, just a reason not to hand-author schematic files
-   blind before either KiCad or that answer exists to validate against.
-
-## Intended structure, once both are unblocked
-
-A hierarchical KiCad project (not one flat schematic), sheets matching
-carrier-board-spec.md's blocks:
-
-- `carrier-board.kicad_pro` / `.kicad_sch` (top sheet — just hierarchical
-  sheet symbols, no components)
+- `carrier-board.kicad_pro` / `carrier-board.kicad_sch` — top sheet, just
+  hierarchical sheet symbols (3x3 grid), no components
   - `som_connector.kicad_sch` — the 4x Trenz TE0807 B2B connectors
   - `power.kicad_sch` — carrier-side regulation (HDMI connector-side
     3.3V/5V etc.), on top of whatever the module itself needs
   - `clocking.kicad_sch` — reference clock synthesizer(s) for the
-    (pending the open question) independently-clocked HDMI ports
+    (pending the open question below) independently-clocked HDMI ports
   - `hdmi_in1.kicad_sch` … `hdmi_in4.kicad_sch` — one sheet per input:
     connector, AC-coupling, ESD protection, level shifting, EDID EEPROM
   - `hdmi_out.kicad_sch` — output connector + associated circuitry
   - `ethernet.kicad_sch` — Gigabit Ethernet PHY on RGMII from the PS
     (control-plane link, deliberately off the GTH budget)
-- `carrier-board.kicad_pcb` — layout, once schematics are captured
+- `carrier-board.kicad_pcb` — not created yet; comes after schematics
 
-## Not done here, and not safe to fake
+Every sheet is currently a stub (title block only, no symbols) — verified
+by round-tripping through `kicad-cli sch upgrade` (parses and re-saves
+cleanly) and `kicad-cli sch erc` (0 errors, 0 warnings, all 9 sheets
+resolve correctly through the hierarchy). Open `carrier-board.kicad_pro`
+in KiCad to see the block-diagram-level layout.
 
-I didn't hand-author placeholder `.kicad_pro`/`.kicad_sch` files for
-this, on purpose: those formats (JSON + S-expression) have version/UUID
-fields that need to round-trip cleanly through the actual application,
-and I have no way to open or validate them without KiCad installed here.
-A file I can't test is worse than no file — it looks done but might
-silently fail to open or repair-corrupt on first launch. Once KiCad is
-installed (by you, or in a future session where `kicad-cli` is
-available), creating this skeleton is a quick, well-defined task.
+## Why no components are placed yet
+
+The GTH cross-quad clocking question in carrier-board-spec.md is still
+open: whether the UltraScale+ GTH clocking backbone (UG578) allows a
+coherent 5th independently-clocked HDMI port by borrowing lanes across
+quads, or whether this carrier's first revision ships with 4 native
+ports and defers the 5th. Real schematic capture — actual GTH pin
+assignments in `som_connector.kicad_sch`, connector pinouts in the
+`hdmi_*.kicad_sch` sheets — shouldn't start until that's resolved, since
+it directly determines the pin mapping. Nothing about the sheet
+structure itself depends on the answer, which is why the skeleton was
+safe to build now.
+
+## Next steps
+
+1. Resolve the cross-quad clocking question (UG578 research).
+2. Get the exact Samtec B2B connector part number from Trenz for
+   `som_connector.kicad_sch`'s footprints.
+3. Decide the reference clock synthesizer part for `clocking.kicad_sch`.
+4. Populate `hdmi_in*.kicad_sch` / `hdmi_out.kicad_sch` with actual
+   connector + support circuitry once 1-3 are settled.

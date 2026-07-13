@@ -1,0 +1,370 @@
+(kicad_sch
+	(version 20260306)
+	(generator "eeschema")
+	(generator_version "10.0")
+	(uuid "380d1dee-337c-4e94-ab88-868968bd7a88")
+	(paper "A4")
+	(title_block
+		(title "OpenAVSwitch Carrier Board - Top Level")
+		(company "OpenAVSwitch")
+		(comment 1 "SOM+carrier for Trenz TE0807 (XCZU7EV) -- see docs/carrier-board-spec.md")
+		(comment 2 "Pending: GTH cross-quad clocking question -- do not assign pins yet")
+	)
+	(lib_symbols)
+	(sheet
+		(at 80 120)
+		(size 25.4 12.7)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(fill
+			(color 0 0 0 0)
+		)
+		(uuid "0fd0a589-ca87-479e-8f49-bc08df393df2")
+		(property "Sheetname" "HDMI Output"
+			(at 80 119 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Sheetfile" "hdmi_out.kicad_sch"
+			(at 80 134 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+			)
+		)
+	)
+	(sheet
+		(at 140 20)
+		(size 25.4 12.7)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(fill
+			(color 0 0 0 0)
+		)
+		(uuid "1082d75a-2aa9-4082-b195-d4356be9328e")
+		(property "Sheetname" "Reference Clocking"
+			(at 140 19 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Sheetfile" "clocking.kicad_sch"
+			(at 140 34 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+			)
+		)
+	)
+	(sheet
+		(at 80 70)
+		(size 25.4 12.7)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(fill
+			(color 0 0 0 0)
+		)
+		(uuid "1861e0c7-0712-405c-b94d-f605e489a3ca")
+		(property "Sheetname" "HDMI Input 2"
+			(at 80 69 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Sheetfile" "hdmi_in2.kicad_sch"
+			(at 80 84 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+			)
+		)
+	)
+	(sheet
+		(at 80 20)
+		(size 25.4 12.7)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(fill
+			(color 0 0 0 0)
+		)
+		(uuid "43d97587-eb5e-48b5-8ace-117861c06468")
+		(property "Sheetname" "Power"
+			(at 80 19 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Sheetfile" "power.kicad_sch"
+			(at 80 34 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+			)
+		)
+	)
+	(sheet
+		(at 140 120)
+		(size 25.4 12.7)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(fill
+			(color 0 0 0 0)
+		)
+		(uuid "475ed164-3c8b-4761-b7e3-ed6c98bf1b60")
+		(property "Sheetname" "Gigabit Ethernet PHY"
+			(at 140 119 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Sheetfile" "ethernet.kicad_sch"
+			(at 140 134 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+			)
+		)
+	)
+	(sheet
+		(at 20 70)
+		(size 25.4 12.7)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(fill
+			(color 0 0 0 0)
+		)
+		(uuid "74e9a97d-7495-498e-a41b-dee530583436")
+		(property "Sheetname" "HDMI Input 1"
+			(at 20 69 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Sheetfile" "hdmi_in1.kicad_sch"
+			(at 20 84 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+			)
+		)
+	)
+	(sheet
+		(at 20 120)
+		(size 25.4 12.7)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(fill
+			(color 0 0 0 0)
+		)
+		(uuid "ae56b276-5680-4474-94d2-f93410a31c07")
+		(property "Sheetname" "HDMI Input 4"
+			(at 20 119 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Sheetfile" "hdmi_in4.kicad_sch"
+			(at 20 134 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+			)
+		)
+	)
+	(sheet
+		(at 140 70)
+		(size 25.4 12.7)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(fill
+			(color 0 0 0 0)
+		)
+		(uuid "bad34afe-4261-4de9-8481-553edea7099b")
+		(property "Sheetname" "HDMI Input 3"
+			(at 140 69 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Sheetfile" "hdmi_in3.kicad_sch"
+			(at 140 84 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+			)
+		)
+	)
+	(sheet
+		(at 20 20)
+		(size 25.4 12.7)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(fill
+			(color 0 0 0 0)
+		)
+		(uuid "d5646dfd-722f-479c-906b-9f5106b7ae89")
+		(property "Sheetname" "SOM Connector"
+			(at 20 19 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Sheetfile" "som_connector.kicad_sch"
+			(at 20 34 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+			)
+		)
+	)
+	(sheet_instances
+		(path "/"
+			(page "1")
+		)
+	)
+)
