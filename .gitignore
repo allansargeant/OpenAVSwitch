@@ -12,5 +12,9 @@
 vivado*.jou
 vivado*.log
 
+# Simulation build artifacts
+*.vvp
+*.vcd
+
 # OS
 .DS_Store
