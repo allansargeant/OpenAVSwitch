@@ -8,13 +8,19 @@ Repo scaffold, [architecture.md](architecture.md), draft
 [io-card-spec.md](io-card-spec.md). No hardware or RTL yet.
 
 ## Phase 1 — 4-in / 1-out HDMI 4K seamless switcher (single board)
-The concrete near-term goal. One eval board (proposed: ZCU106-class Zynq
-UltraScale+ + HDMI FMC mezzanine(s)), no card cage, no multi-layer
-compositing, no third-party card support. Just: 4 continuously-captured
-HDMI inputs, up to 4K, one output, switching between them with no glitch.
-This proves the capture -> frame-buffer -> scale -> crossbar -> output
-pipeline described in architecture.md. See a dedicated phase-1 plan doc
-once the target board is confirmed.
+The concrete near-term goal. One eval board (recommended: ALINX Z7-P,
+Zynq UltraScale+ XCZU7EV, see [hardware-selection.md](hardware-selection.md)
++ HDMI FMC card(s), likely a mix of direct-GTH and chip-based receivers),
+no card cage, no multi-layer compositing, no third-party card support.
+Just: 4 continuously-captured HDMI inputs, up to 4K, one output,
+switching between them with no glitch. This proves the capture ->
+frame-buffer -> scale -> crossbar -> output pipeline described in
+architecture.md.
+
+**Logic/simulation track: done** — see [phase1-plan.md](phase1-plan.md)
+and [../sim/README.md](../sim/README.md). Switching and nearest-neighbor
+scaling both proven in Icarus Verilog simulation. **Hardware bring-up
+track: not started** — board recommended but not purchased.
 
 **Exit criteria:** switch between any of 4 live 4K sources on the single
 output with no visible black frame / resync, and independent scale

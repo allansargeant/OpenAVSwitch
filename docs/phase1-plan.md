@@ -5,11 +5,18 @@ fixed reference instead of re-deciding things per module.
 
 ## Target hardware (real board, later)
 
-Proposed: a ZCU106-class Zynq UltraScale+ eval board + HDMI-capable FMC
-mezzanine(s) for the 4 inputs and 1 output, per
-[architecture.md](architecture.md). Not yet purchased/confirmed — nothing
-in the RTL below depends on this choice, deliberately, so hardware
-selection doesn't block logic-level work.
+Researched and recommended (not yet purchased) in
+[hardware-selection.md](hardware-selection.md): **ALINX Z7-P**
+(XCZU7EV Zynq UltraScale+, same chip family as originally proposed,
+~2.5x cheaper than AMD's own ZCU106) + HDMI-capable FMC card(s) for the
+4 inputs and 1 output. Key refinement over the original proposal: GTH
+transceiver budget, not compute/DDR bandwidth, turns out to be the real
+constraint on reaching 4 simultaneous HDMI inputs, so the real design
+likely mixes a couple of direct-GTH ports with a couple of chip-based
+(MIPI-CSI-2) receiver ports rather than 4 identical direct-GTH ports —
+see hardware-selection.md for why. Still not purchased — nothing in the
+RTL below depends on this choice, deliberately, so hardware selection
+doesn't block logic-level work.
 
 ## What Phase 1 actually proves
 
