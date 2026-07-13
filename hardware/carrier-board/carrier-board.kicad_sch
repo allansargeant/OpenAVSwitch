@@ -8,7 +8,7 @@
 		(title "OpenAVSwitch Carrier Board - Top Level")
 		(company "OpenAVSwitch")
 		(comment 1 "SOM+carrier for Trenz TE0807 (XCZU7EV) -- see docs/carrier-board-spec.md")
-		(comment 2 "Pending: GTH cross-quad clocking question -- do not assign pins yet")
+		(comment 2 "Clocking resolved: quads 224/225/226/227, OUT borrows lanes via quad 225 xquad relay")
 	)
 	(lib_symbols)
 	(sheet

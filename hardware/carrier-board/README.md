@@ -16,7 +16,10 @@ blocks:
   - `power.kicad_sch` — carrier-side regulation (HDMI connector-side
     3.3V/5V etc.), on top of whatever the module itself needs
   - `clocking.kicad_sch` — reference clock synthesizer(s) for the
-    (pending the open question below) independently-clocked HDMI ports
+    independently-clocked HDMI ports (4 inputs each with their own
+    synthesizer; output borrows lanes from quads 224/225/226, sharing
+    225's reference — see carrier-board-spec.md for the IN2/OUT coupling
+    this implies)
   - `hdmi_in1.kicad_sch` … `hdmi_in4.kicad_sch` — one sheet per input:
     connector, AC-coupling, ESD protection, level shifting, EDID EEPROM
   - `hdmi_out.kicad_sch` — output connector + associated circuitry
@@ -32,22 +35,25 @@ in KiCad to see the block-diagram-level layout.
 
 ## Why no components are placed yet
 
-The GTH cross-quad clocking question in carrier-board-spec.md is still
-open: whether the UltraScale+ GTH clocking backbone (UG578) allows a
-coherent 5th independently-clocked HDMI port by borrowing lanes across
-quads, or whether this carrier's first revision ships with 4 native
-ports and defers the 5th. Real schematic capture — actual GTH pin
-assignments in `som_connector.kicad_sch`, connector pinouts in the
-`hdmi_*.kicad_sch` sheets — shouldn't start until that's resolved, since
-it directly determines the pin mapping. Nothing about the sheet
-structure itself depends on the answer, which is why the skeleton was
-safe to build now.
+The GTH cross-quad clocking question that used to block this is now
+resolved (see carrier-board-spec.md): confirmed from UG576/UG578 that
+UltraScale+ GTH quads can share a reference clock across up to 2
+neighboring quads via dedicated `GTNORTHREFCLK`/`GTSOUTHREFCLK` routing,
+well within budget for HDMI TMDS's ~5.94Gb/s line rate, and XCZU7EV's
+quads 224-227 are confirmed physically sequential/adjacent — so the full
+4-in+1-out native design fits on TE0807's 16 GTH lanes (allocation table
+in carrier-board-spec.md). What's left before real schematic capture is
+component/part selection (connector, clock synthesizer), not an open
+architectural question.
 
 ## Next steps
 
-1. Resolve the cross-quad clocking question (UG578 research).
-2. Get the exact Samtec B2B connector part number from Trenz for
+1. Get the exact Samtec B2B connector part number from Trenz for
    `som_connector.kicad_sch`'s footprints.
-3. Decide the reference clock synthesizer part for `clocking.kicad_sch`.
-4. Populate `hdmi_in*.kicad_sch` / `hdmi_out.kicad_sch` with actual
-   connector + support circuitry once 1-3 are settled.
+2. Decide the reference clock synthesizer part for `clocking.kicad_sch`,
+   accounting for the quad-225/HDMI-OUT reference-clock coupling noted
+   in carrier-board-spec.md.
+3. Populate `hdmi_in*.kicad_sch` / `hdmi_out.kicad_sch` with actual
+   connector + support circuitry once 1-2 are settled.
+4. Confirm the GTH allocation at the Vivado pin-planner level once pins
+   start getting assigned, as a final sanity check.
