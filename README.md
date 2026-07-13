@@ -1,4 +1,4 @@
-# av-mainframe
+# OpenAVSwitch
 
 An open, modular AV processing mainframe in the spirit of the Analog Way
 Aquilon / Barco E3 class of live-event video processors: multiple
@@ -6,13 +6,27 @@ simultaneous inputs, multi-layer real-time compositing/scaling, and seamless
 switching, built on commodity FPGA SoCs instead of closed proprietary
 hardware.
 
-This project takes inspiration from [MiSTer FPGA](https://github.com/MiSTer-devel)
-(open, community-driven, reproducible FPGA hardware) but is **not** a MiSTer
-fork or derivative — MiSTer's DE10-Nano/Cyclone V target has no HDMI input
-path and essentially no spare logic or DDR3 bandwidth once the HPS Linux
-bridge is accounted for. It's the wrong base for this project. See
-[docs/architecture.md](docs/architecture.md) for why this is being built on
-Xilinx/AMD Zynq UltraScale+ instead.
+## Disclaimers
+
+**Relationship to MiSTer FPGA:** this project is *inspired by* the
+[MiSTer FPGA project](https://github.com/MiSTer-devel) — its open,
+community-driven, reproducible approach to FPGA hardware — but it is
+**not** a MiSTer fork, derivative, or dependent in any way. No MiSTer
+code, cores, or framework are used here. MiSTer's DE10-Nano/Cyclone V
+target has no HDMI input path and essentially no spare logic or DDR3
+bandwidth once its HPS Linux bridge is accounted for, so it's the wrong
+technical base for this project regardless; everything in `rtl/` and
+`docs/` here is original, targeting Xilinx/AMD Zynq UltraScale+ instead.
+See [docs/architecture.md](docs/architecture.md) for the full reasoning.
+
+**AI involvement:** the RTL, testbenches, and documentation in this
+repository are being written collaboratively with AI assistance (Claude
+Code), directed and reviewed by a human author. Treat this as you would
+any early-stage hobby/community hardware project: nothing here has been
+through professional design review, third-party audit, or real-hardware
+validation yet (see [Status](#status) below). Read the design docs and
+RTL critically, especially before relying on this for anything beyond
+simulation.
 
 ## Vision
 
@@ -24,8 +38,13 @@ to many simultaneous 4K/8K inputs across multiple layers.
 
 ## Status
 
-Pre-hardware, architecture/spec phase. Nothing has been built or synthesized
-yet — see [docs/](docs/) for the current design docs and
+Pre-hardware. The Phase 1 **logic/simulation track** is done and passing:
+a double-buffered continuous-capture pipeline, a per-channel
+nearest-neighbor scaler, and a frame-boundary-latched seamless switch,
+all proven in Icarus Verilog simulation across 4 asynchronous,
+mismatched-resolution simulated sources — see [sim/README.md](sim/README.md).
+Nothing has been synthesized or run on real silicon yet; no board has
+been purchased. See [docs/](docs/) for design docs and
 [docs/roadmap.md](docs/roadmap.md) for the phased plan.
 
 ## Phase 1 goal
@@ -34,7 +53,8 @@ A single board (no card cage yet): 4x HDMI input, 4K-capable, seamlessly
 switched/scaled to 1x HDMI output. Proves the capture -> frame buffer ->
 scale -> crossbar -> output pipeline before any of the modularity
 (daughtercards, multi-layer compositing, third-party card support) is
-layered on. Details in [docs/roadmap.md](docs/roadmap.md).
+layered on. Details in [docs/phase1-plan.md](docs/phase1-plan.md) and
+[docs/roadmap.md](docs/roadmap.md).
 
 ## Repo layout
 
