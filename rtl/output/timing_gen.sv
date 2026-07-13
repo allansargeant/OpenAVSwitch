@@ -1,10 +1,16 @@
-// Minimal parametrized video timing generator: produces de, a linear pixel
-// address for active video, and a frame_start pulse a few lines into
-// vertical blanking (not at the very start of the next frame) so that
-// downstream frame-boundary latches (output_crossbar) and registered
-// memory reads (frame_buffer_channel) have several cycles of margin to
-// settle before the next frame's first active pixel — see
-// output_crossbar.sv's latency note.
+// Minimal parametrized video timing generator: produces de, active-video
+// x/y coordinates, and a frame_start pulse a few lines into vertical
+// blanking (not at the very start of the next frame) so that downstream
+// frame-boundary latches (output_crossbar) and registered memory reads
+// (frame_buffer_channel) have several cycles of margin to settle before
+// the next frame's first active pixel — see output_crossbar.sv's latency
+// note.
+//
+// Outputs x/y rather than a flat address because downstream per-channel
+// scalers (rtl/scaler/nn_scaler.sv) need independent horizontal and
+// vertical ratios — a flat address would already have baked in this
+// generator's own width, which is wrong for any channel at a different
+// resolution.
 //
 // Standing in for a real 4K HDMI transmitter's timing later; H/V
 // active+blank are parameters specifically so this can be swapped for real
@@ -18,9 +24,10 @@ module timing_gen #(
     input logic clk,
     input logic rst_n,
 
-    output logic                                     de,
-    output logic                                     frame_start,
-    output logic [$clog2(H_ACTIVE * V_ACTIVE)-1:0]   addr
+    output logic                     de,
+    output logic                     frame_start,
+    output logic [$clog2(H_ACTIVE)-1:0] x,
+    output logic [$clog2(V_ACTIVE)-1:0] y
 );
 
   localparam int HTotal = H_ACTIVE + H_BLANK;
@@ -43,6 +50,7 @@ module timing_gen #(
 
   assign de          = (hcount < H_ACTIVE) && (vcount < V_ACTIVE);
   assign frame_start  = (hcount == 0) && (vcount == V_ACTIVE);
-  assign addr         = de ? (vcount * H_ACTIVE + hcount) : '0;
+  assign x            = de ? hcount[$clog2(H_ACTIVE)-1:0] : '0;
+  assign y            = de ? vcount[$clog2(V_ACTIVE)-1:0] : '0;
 
 endmodule

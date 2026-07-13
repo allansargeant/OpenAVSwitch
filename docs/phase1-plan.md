@@ -40,28 +40,39 @@ Phase 1 is split into two tracks that can proceed independently:
 - `rtl/capture/frame_buffer_channel.sv` — per-channel double-buffered
   frame store: raster-order write in the source clock domain, CDC
   handoff of "latest complete buffer index" to the shared clock domain.
+- `rtl/scaler/nn_scaler.sv` — per-channel nearest-neighbor scaler,
+  mapping the output's (x, y) into that channel's own native resolution
+  before it hits `frame_buffer_channel.rd_addr`. Fixed-point multiply,
+  not yet an accumulator (see module comment for the tradeoff).
 - `rtl/compositor/output_crossbar.sv` — N-channel select, latched only
   at the output's own frame boundary, reads the selected channel's
   latest-complete buffer for that whole frame.
-- `rtl/output/timing_gen.sv` — parametrized hsync/vsync/de generator.
+- `rtl/output/timing_gen.sv` — parametrized de/frame_start/x/y generator.
 - `sim/models/video_source_sim.sv` — sim-only free-running test-pattern
-  generator per input, each at an independently-chosen clock period, to
-  emulate 4 unsynchronized HDMI sources.
+  generator per input, each at an independently-chosen clock period and
+  resolution, to emulate 4 unsynchronized, mismatched-resolution HDMI
+  sources.
 - `sim/tb_top.sv` — wires it all together, drives channel-select changes
-  (including deliberately mid-frame) and self-checks that output frames
-  never mix sources within a frame and are never blank/corrupted.
+  (including deliberately mid-frame) and self-checks both the switch
+  (no cross-frame mixing) and the scaler (decoded pixel position matches
+  an independent nearest-neighbor reference model).
 
-Test pattern content is a source-id + frame-counter tag, not real RGB —
-this track is proving pipeline/CDC correctness, not image quality, so
-keeping payload trivial keeps simulation fast and the self-check simple.
-Real pixel data (10-bit YCbCr/RGB) is a width parameter change later,
-not a structural one.
+Test pattern content is `{channel_id, y, x}`, not real RGB — this track
+is proving pipeline/CDC/scaling correctness, not image quality, so
+keeping payload trivial keeps simulation fast and the self-check able to
+verify exact source and position. Real pixel data (10-bit YCbCr/RGB) is
+a width parameter change later, not a structural one.
+
+**Status: done and passing** (see [../sim/README.md](../sim/README.md)) —
+switching and nearest-neighbor scaling both proven in simulation across
+4 asynchronous, mismatched-resolution sources.
 
 ## Deferred out of Phase 1 scope
 
-- Scaling (Phase 1 assumes matching input/output resolution to isolate
-  the switching logic first; a real scaler engine is next once this
-  passes).
+- Bilinear (or better) scaling — nearest-neighbor only for now; would add
+  fractional weights and up to 4 source reads instead of 1.
 - Multi-layer compositing (Phase 2).
 - Any daughtercard/FMC-spec work (Phase 3).
 - Real HDCP/EDID handling.
+- Real HDMI receiver front-end / hardware bring-up track (separate from
+  this logic/simulation track, not started).

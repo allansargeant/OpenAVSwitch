@@ -1,6 +1,7 @@
 SRC := \
 	../rtl/common/sync_2ff.sv \
 	../rtl/capture/frame_buffer_channel.sv \
+	../rtl/scaler/nn_scaler.sv \
 	../rtl/compositor/output_crossbar.sv \
 	../rtl/output/timing_gen.sv \
 	models/video_source_sim.sv \
