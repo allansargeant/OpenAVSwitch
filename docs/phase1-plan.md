@@ -5,29 +5,33 @@ fixed reference instead of re-deciding things per module.
 
 ## Target hardware (real board, later)
 
-Researched, not yet purchased — see [hardware-selection.md](hardware-selection.md)
-for the full reasoning, which has evolved twice already:
+Researched, not yet purchased. See [hardware-selection.md](hardware-selection.md)
+and [carrier-board-spec.md](carrier-board-spec.md) for the full
+reasoning, which has evolved several times:
 
 1. First pass proposed ZCU106-class + generic HDMI FMC mezzanines.
-2. Second pass found GTH transceiver budget, not compute/DDR bandwidth,
-   is the real constraint, and initially suggested offloading some
-   inputs to chip-based (MIPI-CSI-2) HDMI receivers to save GTH budget.
-3. **Current (superseding #2)**: HDMI capture must support arbitrary
-   custom timings/refresh rates (see architecture.md), which rules out
-   chip-based receivers for HDMI entirely — they're built for consumer
-   CEA-861 compliance. All HDMI ports must be direct-GTH. At 3 GTH
-   channels per port, **4 native HDMI inputs + 1 native output (15 GTH)
-   does not fit on a single ZCU106 or Z7-P's exposed transceiver
-   budget** — recommended path is to stage it: prototype on **AMD
-   ZCU106** (its onboard HDMI gives 1 native in + 1 native out for free,
-   then FMC HPC0 adds 2 more native inputs = 3 of 4 total), with the 4th
-   input coming from a second board/FMC slot later rather than blocking
-   on it.
+2. Found GTH transceiver budget, not compute/DDR bandwidth, is the real
+   constraint; briefly considered chip-based (MIPI-CSI-2) HDMI receivers
+   to save budget, then ruled that out — HDMI capture must support
+   arbitrary custom timings/refresh rates (architecture.md), and
+   chip-based receivers are built for consumer CEA-861 compliance, not
+   arbitrary sync. All HDMI ports must be direct-GTH.
+3. That reopened the transceiver math on eval boards (staged ZCU106
+   plan) before landing on the current, final approach below.
+4. **Current**: custom carrier board around a Zynq UltraScale+ SOM
+   (**Trenz TE0807**, XCZU7EV) instead of an eval board — a bare SOM
+   exposes its full 16 GTH lanes instead of pre-spending them on
+   onboard peripherals. Even so, one TE0807's 4 GTH quads only support
+   **3 fully-independent native inputs + 1 native output** without a
+   real rate-coupling compromise (see carrier-board-spec.md's corrected
+   clocking analysis). **Decided: the 4th input is deferred to a second
+   TE0807/carrier board** rather than compromised — Phase 1's hardware
+   now spans two boards, not one.
 
-Still not purchased, and the staging question is an open decision (see
-hardware-selection.md) — nothing in the RTL below depends on this
-choice, deliberately, so hardware selection doesn't block logic-level
-work.
+Still not purchased. KiCad project skeleton exists
+(`hardware/carrier-board/`) for the first board (3 native in + 1 native
+out); nothing in the RTL below depends on any of this, deliberately, so
+hardware selection doesn't block logic-level work.
 
 ## What Phase 1 actually proves
 

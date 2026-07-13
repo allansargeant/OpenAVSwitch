@@ -1,13 +1,13 @@
 # Carrier board spec (SOM + custom carrier)
 
-Status: draft, pre-schematic. Captures the SOM choice and the GTH
-transceiver budget/mapping. **Correction from an earlier version of this
-doc**: a previous pass concluded 4-in+1-out native HDMI fits cleanly on
-TE0807's 16 GTH by having HDMI OUT borrow lanes across quads. That
-conclusion was wrong in an important way — see "Corrected conclusion"
-below. Current answer: **3 fully-independent native inputs + 1
-fully-independent native output fit cleanly; the 4th input needs either
-a compromise or a second board.**
+Status: draft, pre-schematic. Captures the SOM choice, the GTH
+transceiver budget/mapping, and this board's finalized scope: **3 fully-
+independent native HDMI inputs + 1 fully-independent native HDMI
+output**, one GTH quad each. (An earlier pass in this doc's history
+concluded 4-in+1-out fit on one board via cross-quad lane sharing —
+wrong, see "What the earlier pass got wrong" below for why.) The 4th
+input is deferred to a second TE0807/carrier board (decided 2026-07-13),
+not part of this board's design.
 
 ## SOM choice: Trenz TE0807 (recommended)
 
@@ -123,25 +123,19 @@ rate. GTH (16.3Gbps-rated) is the safe choice for all video, consistent
 with hardware-selection.md.
 
 This gives 3 native inputs + 1 native output, all genuinely
-independent — no rate coupling, no shared-reference conflict. **The 4th
-input doesn't fit on this SOM with full independence, and needs one of:**
+independent — no rate coupling, no shared-reference conflict.
 
-1. **Defer it** to a second TE0807/carrier (mirrors the project's own
-   eventual card-cage vision — each board is a natural stand-in for a
-   future chassis slot, consistent with how hardware-selection.md
-   already reasoned about staging).
-2. **Accept the coupling for one input specifically**, if one of the 4
-   inputs can tolerate being rate-constrained relative to another
-   port's reference (e.g. if it's expected to mostly see standard
-   formats rather than truly arbitrary ones) — this reintroduces exactly
-   the kind of compromise the native-capture requirement was meant to
-   rule out, so it's a real trade-off, not a free win.
-3. **Move to a device/board with more independent quads** — noted as an
-   option in hardware-selection.md already (transceiver-richer device
-   family), still not researched in depth.
-
-No default picked here — this is a real decision, flagged for you
-rather than assumed.
+**Decided (2026-07-13): the 4th input is deferred to a second
+TE0807/carrier board**, not squeezed onto this one. This board's scope
+is now fixed: 3 native HDMI inputs + 1 native HDMI output, all fully
+independent. Mirrors the project's own eventual card-cage vision — this
+board is a natural stand-in for a future chassis slot, and Phase 1's
+overall 4-in+1-out goal (docs/roadmap.md) is still reached, just across
+two boards instead of one. The other two options considered (accepting a
+rate-coupling compromise on one port, or a transceiver-richer device)
+were rejected: the first reintroduces exactly the limitation the
+native-capture requirement exists to avoid, and the second is unresearched
+and likely costs more / loses the hard Arm PS.
 
 ## Control plane: keep it off the GTH budget
 
@@ -175,9 +169,6 @@ Ethernet PHY on RGMII from the PS, no PCIe on this board rev.
 
 ## Open items before ordering the SOM or starting schematic capture
 
-- **Decide how to handle the 4th input** (defer to a second board,
-  accept a rate-coupling compromise on one port, or research a
-  transceiver-richer device) — the main open decision now.
 - Get the exact Samtec B2B connector part number from Trenz (for KiCad
   footprint sourcing).
 - Decide the reference clock synthesizer part (4 independent outputs

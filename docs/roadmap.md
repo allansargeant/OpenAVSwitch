@@ -7,7 +7,7 @@ rather than trying to build the modular chassis system up front.
 Repo scaffold, [architecture.md](architecture.md), draft
 [io-card-spec.md](io-card-spec.md). No hardware or RTL yet.
 
-## Phase 1 — 4-in / 1-out HDMI 4K seamless switcher (custom carrier board)
+## Phase 1 — 4-in / 1-out HDMI 4K seamless switcher (custom carrier board(s))
 The concrete near-term goal. Hardware plan evolved from "buy an eval
 board" to a **custom carrier board around a Zynq UltraScale+ SOM**
 (recommended: Trenz TE0807, XCZU7EV) — see
@@ -17,11 +17,18 @@ board" to a **custom carrier board around a Zynq UltraScale+ SOM**
 direct-GTH capture on every port, and no off-the-shelf eval board has
 enough spare transceiver budget for 4 native inputs + 1 native output.
 A bare SOM exposes its full transceiver budget instead of pre-spending it
-on onboard peripherals we don't need. Still: 4 continuously-captured
-HDMI inputs, up to 4K, one output, switching between them with no
-glitch, proving the capture -> frame-buffer -> scale -> crossbar ->
-output pipeline described in architecture.md — the functional goal
-hasn't changed, only how the hardware gets there.
+on onboard peripherals we don't need.
+
+One more refinement: a single TE0807's 4 GTH quads only support **3
+fully-independent native inputs + 1 native output** without a real rate-
+coupling compromise (see carrier-board-spec.md's "corrected conclusion"
+for why cross-quad clock sharing doesn't actually buy a 5th independent
+port). Decided to defer the 4th input to a second board rather than
+compromise — so Phase 1's hardware now spans **two carrier boards**, not
+one. The functional goal is unchanged: 4 continuously-captured HDMI
+inputs, up to 4K, one output, switching between them with no glitch,
+proving the capture -> frame-buffer -> scale -> crossbar -> output
+pipeline described in architecture.md.
 
 **Logic/simulation track: done** — see [phase1-plan.md](phase1-plan.md)
 and [../sim/README.md](../sim/README.md). Switching and nearest-neighbor
