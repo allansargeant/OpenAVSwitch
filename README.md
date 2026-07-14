@@ -28,6 +28,8 @@ validation yet (see [Status](#status) below). Read the design docs and
 RTL critically, especially before relying on this for anything beyond
 simulation.
 
+![Phase 1 signal path: 4x asynchronous HDMI inputs through per-channel capture and scaling into a frame-boundary-latched seamless switch, out to 1x HDMI output](docs/diagrams/phase1-blueprint.svg)
+
 ## Vision
 
 A chassis-style system: a host/control card plus a bus of pluggable I/O
