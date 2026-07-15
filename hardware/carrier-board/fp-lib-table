@@ -1,0 +1,6 @@
+(fp_lib_table
+  (version 7)
+  (lib (name "carrier_footprints")(type "KiCad")(uri "${KIPRJMOD}/libs/footprints.pretty")(options "")(descr "OpenAVSwitch carrier board: downloaded/transcribed footprints"))
+  (lib (name "TXS0102DCUR")(type "KiCad")(uri "${KIPRJMOD}/libs/footprints.pretty")(options "")(descr "Alias matching the footprint ref baked into the downloaded symbol"))
+  (lib (name "SS5-80-3.50-X-D-K-XX")(type "KiCad")(uri "${KIPRJMOD}/libs/footprints.pretty")(options "")(descr "Alias matching the footprint ref baked into the downloaded symbol"))
+)

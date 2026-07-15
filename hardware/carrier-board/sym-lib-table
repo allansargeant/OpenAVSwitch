@@ -1,0 +1,5 @@
+(sym_lib_table
+  (version 7)
+  (lib (name "TXS0102DCUR")(type "KiCad")(uri "${KIPRJMOD}/libs/symbols/TXS0102DCUR.kicad_sym")(options "")(descr "TI TXS0102DCUR level translator (SnapEDA)"))
+  (lib (name "SS5-80-3.50-X-D-K-XX")(type "KiCad")(uri "${KIPRJMOD}/libs/symbols/SS5-80-3.50-X-D-K-XX.kicad_sym")(options "")(descr "Samtec SS5-80-3.50-X-D-K-XX B2B socket (SnapEDA)"))
+)

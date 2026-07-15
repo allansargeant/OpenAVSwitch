@@ -1,7 +1,6 @@
 # Carrier board (KiCad project)
 
-Status: **hierarchical project skeleton created and validated, scope
-finalized, no components placed yet.** Design content lives in
+Status: **real component placement underway.** Design content lives in
 [../../docs/carrier-board-spec.md](../../docs/carrier-board-spec.md) —
 read that first.
 
@@ -9,59 +8,66 @@ read that first.
 
 **3 fully-independent native HDMI inputs + 1 fully-independent native
 HDMI output**, one GTH quad each on the Trenz TE0807 SOM, no cross-quad
-clock sharing. The 4th input (for Phase 1's overall 4-in+1-out goal) is
-deferred to a second TE0807/carrier board rather than compromised —
-see carrier-board-spec.md for why cross-quad sharing doesn't actually
-buy a 5th independent port.
+clock sharing. The 4th input is deferred to a second TE0807/carrier
+board — see carrier-board-spec.md for why.
 
-## What's here
+## Libraries
 
-A hierarchical KiCad 10 project, sheets matching carrier-board-spec.md's
-blocks:
+`libs/` holds real, downloaded component libraries (SnapEDA exports),
+not placeholders:
 
-- `carrier-board.kicad_pro` / `carrier-board.kicad_sch` — top sheet, just
-  hierarchical sheet symbols, no components
-  - `som_connector.kicad_sch` — the 4x Trenz TE0807 B2B connectors
-    (Samtec SS5-80-3.50-L-D-K-TR, part number confirmed, KiCad footprint
-    available from the official library / SnapEDA)
-  - `power.kicad_sch` — carrier-side regulation (HDMI connector-side
-    3.3V/5V etc.), on top of whatever the module itself needs
-  - `clocking.kicad_sch` — one Silicon Labs Si5341A (10-output
-    any-frequency clock generator, part selected) feeding all 4 quads'
-    reference pins independently, 6 outputs spare
-  - `hdmi_in1.kicad_sch` / `hdmi_in2.kicad_sch` / `hdmi_in3.kicad_sch` —
-    one sheet per input: connector, AC-coupling, ESD protection, level
-    shifting, EDID EEPROM
-  - `hdmi_out.kicad_sch` — output connector + associated circuitry
-  - `ethernet.kicad_sch` — Gigabit Ethernet PHY on RGMII from the PS
-    (control-plane link, deliberately off the GTH budget)
-- `carrier-board.kicad_pcb` — not created yet; comes after schematics
+- `libs/symbols/TXS0102DCUR.kicad_sym`, `libs/symbols/SS5-80-3.50-X-D-K-XX.kicad_sym`
+- `libs/footprints.pretty/` — matching footprints
+- `libs/3dmodels/` — STEP models
+- `sym-lib-table` / `fp-lib-table` — project-local library tables (using
+  `${KIPRJMOD}` relative paths) wiring the above into the project,
+  including name-aliased fp-lib-table entries so the Footprint
+  properties baked into each downloaded symbol resolve correctly.
 
-Every sheet is currently a stub (title block only, no symbols) — verified
-by round-tripping through `kicad-cli sch upgrade` (parses and re-saves
-cleanly) and `kicad-cli sch erc` (0 errors, 0 warnings, all 8 sheets
-resolve correctly through the hierarchy). Open `carrier-board.kicad_pro`
-in KiCad to see the block-diagram-level layout.
+Both downloaded libraries were re-validated through `kicad-cli sch/fp/sym
+upgrade` before use, not trusted blind.
 
-## Why no components are placed yet
+**Still needed** (couldn't find pre-made libraries for these — see
+carrier-board-spec.md for the part numbers): **Si5341A**, **ESD8040**,
+**Amphenol GSD1S211-K1E1-4030**. These need hand-transcription from
+datasheets — real, careful work, not done yet.
 
-Scope and part selection are settled — connector, clock synthesizer, and
-GTH quad allocation are all decided (carrier-board-spec.md). What
-remains is real schematic capture: actual pin assignments, HDMI
-connector-side support circuitry (AC-coupling, ESD, level shifting,
-EDID), and power rail design. That's genuine circuit design work, not
-something to hand-wave into stub files.
+## What's placed
+
+- `hdmi_in1.kicad_sch`, `hdmi_in2.kicad_sch`, `hdmi_in3.kicad_sch`,
+  `hdmi_out.kicad_sch` — each has a TXS0102DCUR (DDC/HPD level
+  translator) placed and fully validated: `kicad-cli sch upgrade`
+  round-trips clean, `kicad-cli sch erc` across the whole hierarchy
+  shows only the expected "pin not connected" warnings (nothing is
+  wired to a net yet, which is correct at this stage) — no structural
+  errors.
+- `som_connector.kicad_sch` — **J1** (Samtec SS5-80-3.50-L-D-K-TR, 160
+  pins) placed. This one has a known, real quirk: the part's symbol is
+  split into 2 units (80 pins each, one per connector row), and
+  `kicad-cli sch upgrade` collapses both placed instances to `(unit 1)`
+  during its normalization pass rather than preserving `unit 1` /
+  `unit 2` as authored. **Verified this doesn't lose or duplicate any
+  pin data** (all 160 pin numbers present, unique, correctly mapped) —
+  it's a cosmetic/organizational quirk in how kicad-cli's non-interactive
+  upgrade handles multi-unit symbols, not a netlist correctness bug.
+  Genuinely couldn't resolve this further without KiCad's interactive
+  GUI (which has purpose-built tools for placing subsequent units of a
+  multi-unit symbol correctly) — **please open this sheet in KiCad and
+  check the unit assignment looks right before J2-J4 get added the same
+  way.** J2, J3, J4 aren't placed yet, pending that check.
 
 ## Next steps
 
-1. Confirm the GTH allocation at the Vivado pin-planner level once pins
-   start getting assigned, as a final sanity check on the architecture-
-   level analysis in carrier-board-spec.md.
-2. Populate `som_connector.kicad_sch` with the SS5 connector footprints
-   and GTH/LVDS pin assignments.
-3. Populate `clocking.kicad_sch` with the Si5341A and its 4 output
-   connections to the quads.
-4. Populate `hdmi_in*.kicad_sch` / `hdmi_out.kicad_sch` with connector +
-   support circuitry (AC-coupling, ESD, level shifting, EDID EEPROM).
-5. Design `power.kicad_sch` once TE0807's exact input rail requirements
-   are transcribed from its TRM.
+1. **You**: open `som_connector.kicad_sch` in real KiCad, confirm J1's
+   two halves show as distinct units (fix in the GUI if not — should be
+   quick there even though it wasn't from text).
+2. Replicate J1's placement pattern to J2, J3, J4 once 1 is resolved.
+3. Hand-transcribe Si5341A, ESD8040, and the Amphenol HDMI connector
+   from their datasheets into new symbol/footprint files.
+4. Populate `clocking.kicad_sch`, `hdmi_in*.kicad_sch` (ESD, connector,
+   EDID), `hdmi_out.kicad_sch`, and `power.kicad_sch` with the
+   transcribed parts.
+5. Actually wire nets between placed components — nothing is connected
+   yet, only placed.
+6. Confirm the GTH allocation at the Vivado pin-planner level once real
+   pin assignments start.
