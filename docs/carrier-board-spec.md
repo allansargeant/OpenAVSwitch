@@ -182,29 +182,46 @@ Ethernet PHY on RGMII from the PS, no PCIe on this board rev.
   EEPROM is a fallback if the soft-I2C-slave approach proves harder than
   expected during bring-up, not the primary plan.
 
-None of this is in KiCad yet — topology/approach chosen, exact part
-numbers (connector, level translator, ESD array) and schematic capture
-still to do.
+**Parts selected** (standard, widely-used choices — not yet cross-shopped
+against alternatives, but solid defaults):
+
+- Connector: **Amphenol GSD1S211-K1E1-4030** (standard right-angle
+  Type-A HDMI receptacle, common in FPGA reference designs).
+- DDC/HPD level translator: **TI TXS0102DCUR** (2-channel bidirectional,
+  auto direction-sensing — the same part family already seen doing this
+  exact 5V-domain job in ALINX's own FH1219 schematic from earlier
+  research, a good real-world confidence signal).
+- ESD protection: needs **two different parts**, not one — the 3 TMDS
+  pairs need a *low-capacitance* array (something in the sub-1pF class,
+  e.g. ON Semi ESD7104-family) so it doesn't degrade the ~6Gbps eye; the
+  slower DDC/HPD/CEC lines can use an ordinary array (e.g. SM712-class).
+  Exact part TBD pending a real signal-integrity check against the GTH
+  RX AC-coupling value during schematic capture — flagged rather than
+  guessed at.
+
+Still not in KiCad — parts chosen, schematic capture not started.
 
 ## Power
 
 TE0807 needs a **single 3.3V input rail** from the carrier — the module
 generates all its own internal rails (VCCINT, MGTAVCC, etc.) via onboard
-SMPS, confirmed from Trenz's own TRM search summary (full PDF not
-re-fetched this pass to save effort; worth double-checking the actual
-TRM before finalizing the power tree). Two things the carrier still
-owns:
+SMPS, confirmed directly from the primary TRM this time (fetched and
+searched, not just a search-engine summary). Two things the carrier
+still owns:
 
-- **Per-bank VCCO**: the SOM's PL I/O banks get their VCCO supplied by
-  the carrier via dedicated B2B connector pins, not generated on-module
-  — carrier picks the voltage per bank (1.8V/2.5V/3.3V) to match what
-  each bank's I/O actually needs (e.g. HDMI level-translator-side logic).
-- **Power sequencing**: TE0807 documents a 3-step sequence (core rails,
-  then main supply, then I/O voltages) — the carrier's VCCO rails need
-  to come up *after* the module's internal core rails are stable, likely
-  via a power-good handshake signal rather than a fixed delay. Not
-  designed yet; needs the full TRM's exact sequencing requirements
-  before schematic capture.
+- **Per-bank VCCO — confirmed from the primary TRM** (not just a search
+  summary this time): banks 47/48 (HD, connector J3) accept 1.2-3.3V;
+  banks 64/65/66 (HP, connectors J1/J4) accept 1.2-1.8V. Carrier supplies
+  each independently — pick per what that bank's HDMI-side logic needs.
+- **Power sequencing — confirmed, concrete requirement**: the TRM states
+  plainly that "core voltages and main supply voltages have to reach
+  stable state and their Power Good signals have to be asserted before
+  other voltages like bank's I/O voltages (VCCOx) can be powered up,"
+  and that all I/Os must stay tri-stated until then. This is a hard
+  requirement, not a suggestion — the carrier must monitor the module's
+  Power Good output(s) and gate its own VCCO regulators on them, not use
+  a fixed startup delay. Sequencing circuit not designed yet, but the
+  requirement is now unambiguous rather than assumed.
 - Separately, carrier-side HDMI circuitry (level translators, ESD ICs)
   needs its own 3.3V/5V rails, on top of the SOM's 3.3V input — ordinary
   linear/switching regulation, no unusual requirements.
@@ -238,9 +255,8 @@ owns:
   schematic capture starts, as a final sanity check on this
   architecture-level analysis — not expected to change the outcome, but
   worth doing before pins are committed to copper.
-- Pick exact connector/level-translator/ESD-array part numbers (topology
-  chosen above, specific parts not sourced yet).
-- Re-verify TE0807's power sequencing requirements against the full TRM
-  (this pass used a search summary, not the primary document).
+- Finalize the TMDS-line ESD array part against a real signal-integrity
+  budget (only flagged as "needs a low-capacitance part," not picked).
+- Design the power-good-gated sequencing circuit for carrier VCCO rails.
 - No SOM purchase has been made yet. This doc is the basis for a
   decision, not a confirmation of one.
