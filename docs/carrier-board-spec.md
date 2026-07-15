@@ -156,8 +156,9 @@ Ethernet PHY on RGMII from the PS, no PCIe on this board rev.
 
 ## HDMI connector-side circuitry (per port, standard practice — not yet in KiCad)
 
-- **Connector**: standard 19-pin Type-A HDMI receptacle (e.g. Amphenol
-  GSD1S211-style or Molex 47960-series).
+- **Connector**: standard 19-pin Type-A HDMI receptacle — specific
+  manufacturer part still TBD (see below; an earlier "Amphenol
+  GSD1S211-K1E1-4030" pick couldn't be verified as real).
 - **TMDS 3 data pairs**: AC-coupled (100nF 0402, standard for GTH RX
   inputs) straight to the SOM's GTH RX pins — no receiver chip, per the
   native-capture requirement. Xilinx's own placement guidance is to keep
@@ -182,24 +183,43 @@ Ethernet PHY on RGMII from the PS, no PCIe on this board rev.
   EEPROM is a fallback if the soft-I2C-slave approach proves harder than
   expected during bring-up, not the primary plan.
 
-**Parts selected** (standard, widely-used choices — not yet cross-shopped
-against alternatives, but solid defaults):
+**Parts status** (updated after an actual KiCad transcription pass, not
+just picked from search — see `hardware/carrier-board/libs/` and its
+README for what's real vs. still open):
 
-- Connector: **Amphenol GSD1S211-K1E1-4030** (standard right-angle
-  Type-A HDMI receptacle, common in FPGA reference designs).
-- DDC/HPD level translator: **TI TXS0102DCUR** (2-channel bidirectional,
-  auto direction-sensing — the same part family already seen doing this
-  exact 5V-domain job in ALINX's own FH1219 schematic from earlier
-  research, a good real-world confidence signal).
-- **ESD protection — resolved, one part covers everything**: **ON Semi
-  ESD8040**, not ESD7104 (last round's pick was rate-mismatched — its
-  own datasheet only validates HDMI 1.4, ~3.4Gb/s/lane). ESD8040's
-  datasheet explicitly includes HDMI 2.0 eye diagrams and covers all 14
-  relevant HDMI lines (TMDS x3 + clock pair + DDC + HPD + CEC + more) in
-  a single package — no separate DDC/HPD array needed after all, one
-  chip per HDMI port.
-
-All parts now chosen. Still not in KiCad — schematic capture not started.
+- **DDC/HPD level translator: TI TXS0102DCUR** — chosen, downloaded from
+  SnapEDA, symbol+footprint validated, **placed and wired-ready in all 4
+  relevant sheets** (hdmi_in1-3, hdmi_out). Done.
+- **Clock synthesizer: Si5341A-B-GM** — chosen, **hand-transcribed from
+  the primary Silicon Labs datasheet** (Table 17, all 64 QFN pins,
+  cross-checked to sum to exactly 64 with no gaps/overlaps), footprint
+  matched to KiCad's own standard JEDEC MO-220 QFN-64 library part
+  (`QFN-64-1EP_9x9mm_P0.5mm_EP5.2x5.2mm`, dimensions confirmed against
+  the datasheet's Table 18). Symbol validated, **placed in
+  clocking.kicad_sch**. Done.
+- **HDMI connector — part number correction needed**: the earlier
+  "Amphenol GSD1S211-K1E1-4030" pick from a previous research pass
+  **could not be verified as a real part number** in this pass — it
+  never turned up in any search, on Amphenol's own site, or anywhere
+  else, despite a genuine effort. Treat that specific part number as
+  unconfirmed/likely wrong. What *is* solid: HDMI Type-A's 19-pin
+  electrical pinout is defined by the public HDMI specification, not
+  proprietary to any manufacturer, so a **generic `HDMI_TypeA_Receptacle`
+  symbol** (20 pins incl. shell) was built from that public pinout with
+  high confidence and validated. **No footprint yet** — a real
+  manufacturer part (Amphenol, Molex, Kycon, etc.) still needs picking
+  and its actual mechanical footprint sourced before layout.
+- **ESD protection (ESD8040): genuinely blocked, not transcribed.**
+  5+ attempts across onsemi.com (403), Mouser/Farnell PDFs (timeout, or
+  wrong document — one attempt returned the unrelated ESD8351
+  datasheet), DigiKey's HTML version (410 Gone), and web archive
+  (blocked entirely) all failed to produce the actual pin-by-pin table.
+  General marketing copy ("14 lines," "UDFN14," "5.5x1.5mm," "0.5mm
+  pitch") is corroborated across multiple sources, but the specific
+  pin-number-to-signal mapping is not, and that's the part that matters
+  for a real BOM — **not fabricated rather than guessed**. Needs either
+  the user sourcing the datasheet directly, or picking a different ESD
+  part whose datasheet is actually accessible.
 
 ## Power
 

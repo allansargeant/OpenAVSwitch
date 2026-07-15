@@ -2,4 +2,6 @@
   (version 7)
   (lib (name "TXS0102DCUR")(type "KiCad")(uri "${KIPRJMOD}/libs/symbols/TXS0102DCUR.kicad_sym")(options "")(descr "TI TXS0102DCUR level translator (SnapEDA)"))
   (lib (name "SS5-80-3.50-X-D-K-XX")(type "KiCad")(uri "${KIPRJMOD}/libs/symbols/SS5-80-3.50-X-D-K-XX.kicad_sym")(options "")(descr "Samtec SS5-80-3.50-X-D-K-XX B2B socket (SnapEDA)"))
+  (lib (name "Si5341A-B-GM")(type "KiCad")(uri "${KIPRJMOD}/libs/symbols/Si5341A-B-GM.kicad_sym")(options "")(descr "Si5341A clock generator, hand-transcribed from Silicon Labs datasheet Table 17"))
+  (lib (name "HDMI_TypeA_Receptacle")(type "KiCad")(uri "${KIPRJMOD}/libs/symbols/HDMI_TypeA_Receptacle.kicad_sym")(options "")(descr "Generic HDMI Type-A pinout per public spec -- no footprint/manufacturer part chosen yet"))
 )
