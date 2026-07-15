@@ -154,11 +154,63 @@ RGMII/SGMII I/O — not GTH — so networking/control access costs regular
 I/O pins, not transceivers. Recommendation: one external Gigabit
 Ethernet PHY on RGMII from the PS, no PCIe on this board rev.
 
+## HDMI connector-side circuitry (per port, standard practice — not yet in KiCad)
+
+- **Connector**: standard 19-pin Type-A HDMI receptacle (e.g. Amphenol
+  GSD1S211-style or Molex 47960-series).
+- **TMDS 3 data pairs**: AC-coupled (100nF 0402, standard for GTH RX
+  inputs) straight to the SOM's GTH RX pins — no receiver chip, per the
+  native-capture requirement. Xilinx's own placement guidance is to keep
+  the caps close to the FPGA/SOM side.
+- **DDC (I2C)**: bus is 5V on the source side; needs a bidirectional
+  level translator (e.g. TI TXS0102 or PCA9306-class) between the
+  connector's 5V DDC and the SOM's 3.3V/1.8V I2C, since we're the sink
+  presenting our own EDID.
+- **HPD (hot-plug detect)**: sink-driven output to the source, 5V logic
+  — same level-translator part can usually do double duty, or a simple
+  open-drain/level-shifted GPIO.
+- **CEC**: optional, deferred — not required for basic capture/display
+  and skipping it simplifies the first revision.
+- **ESD protection**: a dedicated HDMI ESD array IC at the connector
+  (e.g. ON Semi NUF2042-class) across TMDS + DDC + HPD lines — standard,
+  cheap, and connector-adjacent placement matters for effectiveness.
+- **EDID**: recommend **FPGA-driven emulation** (a soft I2C slave under
+  our own control) over a fixed pre-programmed EEPROM. A static EEPROM
+  can't tell a source "yes, I support this specific custom timing" —
+  the whole point of native capture is flexibility, so EDID needs to be
+  equally flexible, not hardcoded at manufacture time. A physical
+  EEPROM is a fallback if the soft-I2C-slave approach proves harder than
+  expected during bring-up, not the primary plan.
+
+None of this is in KiCad yet — topology/approach chosen, exact part
+numbers (connector, level translator, ESD array) and schematic capture
+still to do.
+
+## Power
+
+TE0807 needs a **single 3.3V input rail** from the carrier — the module
+generates all its own internal rails (VCCINT, MGTAVCC, etc.) via onboard
+SMPS, confirmed from Trenz's own TRM search summary (full PDF not
+re-fetched this pass to save effort; worth double-checking the actual
+TRM before finalizing the power tree). Two things the carrier still
+owns:
+
+- **Per-bank VCCO**: the SOM's PL I/O banks get their VCCO supplied by
+  the carrier via dedicated B2B connector pins, not generated on-module
+  — carrier picks the voltage per bank (1.8V/2.5V/3.3V) to match what
+  each bank's I/O actually needs (e.g. HDMI level-translator-side logic).
+- **Power sequencing**: TE0807 documents a 3-step sequence (core rails,
+  then main supply, then I/O voltages) — the carrier's VCCO rails need
+  to come up *after* the module's internal core rails are stable, likely
+  via a power-good handshake signal rather than a fixed delay. Not
+  designed yet; needs the full TRM's exact sequencing requirements
+  before schematic capture.
+- Separately, carrier-side HDMI circuitry (level translators, ESD ICs)
+  needs its own 3.3V/5V rails, on top of the SOM's 3.3V input — ordinary
+  linear/switching regulation, no unusual requirements.
+
 ## Not yet designed (real schematic work, not done here)
 
-- HDMI connector-side circuitry per port: AC-coupling caps on the 3 TMDS
-  data pairs, ESD protection, 5V-tolerant level shifting for
-  HPD/CEC/DDC, EDID emulation (EEPROM or FPGA-driven) per input.
 - **Reference clock generation — part selected**: one **Silicon Labs
   Si5341A** (10-output, any-frequency clock generator, ~$18) feeds all 4
   quads' reference pins from its 10 independent outputs — no sharing
@@ -175,9 +227,6 @@ Ethernet PHY on RGMII from the PS, no PCIe on this board rev.
   Configured over I2C/SPI with Silicon Labs' ClockBuilder Pro tool. Not
   yet validated against real hardware — the usual caveat about
   architecture-level research vs. bring-up measurement applies here too.
-- Power: TE0807 needs specific input rail(s) per its TRM (not
-  transcribed here yet) — carrier needs its own regulation for HDMI
-  connector-side logic (3.3V/5V) on top of whatever the module needs.
 - Explicit **no-HDCP** stance: not implementing HDCP (licensing/legal
   scope, consistent with MiSTer's own position) — protected/encrypted
   HDMI sources will not display. Worth stating plainly in end-user docs
@@ -189,7 +238,9 @@ Ethernet PHY on RGMII from the PS, no PCIe on this board rev.
   schematic capture starts, as a final sanity check on this
   architecture-level analysis — not expected to change the outcome, but
   worth doing before pins are committed to copper.
-- HDMI connector-side circuitry (AC-coupling, ESD, level shifting, EDID)
-  and power rail design still need doing — see "Not yet designed" above.
+- Pick exact connector/level-translator/ESD-array part numbers (topology
+  chosen above, specific parts not sourced yet).
+- Re-verify TE0807's power sequencing requirements against the full TRM
+  (this pass used a search summary, not the primary document).
 - No SOM purchase has been made yet. This doc is the basis for a
   decision, not a confirmation of one.
