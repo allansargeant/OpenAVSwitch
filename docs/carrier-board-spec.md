@@ -191,15 +191,20 @@ against alternatives, but solid defaults):
   auto direction-sensing — the same part family already seen doing this
   exact 5V-domain job in ALINX's own FH1219 schematic from earlier
   research, a good real-world confidence signal).
-- ESD protection: needs **two different parts**, not one — the 3 TMDS
-  pairs need a *low-capacitance* array (something in the sub-1pF class,
-  e.g. ON Semi ESD7104-family) so it doesn't degrade the ~6Gbps eye; the
-  slower DDC/HPD/CEC lines can use an ordinary array (e.g. SM712-class).
-  Exact part TBD pending a real signal-integrity check against the GTH
-  RX AC-coupling value during schematic capture — flagged rather than
-  guessed at.
+- ESD protection: needs **two different parts**, not one. TMDS pairs:
+  **ON Semi ESD7104** — 4-channel, low-capacitance, flow-through package
+  (matched trace lengths for differential pairs), explicitly marketed
+  for HDMI. One real caveat: its datasheet's eye-diagram validation is
+  for HDMI 1.4 rates (~3.4Gb/s/lane) — our target is 4K60 at ~5.94Gb/s.
+  **ESD8040** ("low capacitance array," same onsemi family) turned up in
+  the same search and is likely the better-matched part for our actual
+  rate, but wasn't confirmed in depth — flagging it as the probable
+  correct pick rather than asserting ESD7104 is proven sufficient at
+  our higher rate. DDC/HPD/CEC (slower, less critical): ordinary array,
+  e.g. SM712-class.
 
-Still not in KiCad — parts chosen, schematic capture not started.
+Still not in KiCad — parts chosen (with one still-open ESD question
+above), schematic capture not started.
 
 ## Power
 
@@ -220,11 +225,33 @@ still owns:
   and that all I/Os must stay tri-stated until then. This is a hard
   requirement, not a suggestion — the carrier must monitor the module's
   Power Good output(s) and gate its own VCCO regulators on them, not use
-  a fixed startup delay. Sequencing circuit not designed yet, but the
-  requirement is now unambiguous rather than assumed.
+  a fixed startup delay.
 - Separately, carrier-side HDMI circuitry (level translators, ESD ICs)
   needs its own 3.3V/5V rails, on top of the SOM's 3.3V input — ordinary
   linear/switching regulation, no unusual requirements.
+
+**Sequencing circuit — designed at the concept level.** The TRM's own
+pinout table names the exact signals (module side, per B2B connector
+pin): `PG_FPD` (J2-110), `PG_PL` (J2-104), `PG_DD` (J2-114), `PG_PSG`
+(J2-82), `PG_GT_` (J2-91), `PG_PLL` (J2-80) — one Power Good per power
+domain, all open-drain, pulled up (some internally at 4k7, some noted
+"External" against a specific onboard regulator, e.g. `PG_PSG`/`PG_GT_`
+against TPS7480/TPS7440 — worth re-reading those specific rows in the
+TRM before finalizing, since "External" may mean the carrier needs to
+provide that domain's pull-up itself, not just consume the signal).
+
+Because they're open-drain, the simplest correct circuit is a **wired-
+AND**: tie all `PG_*` signals to one shared node with a single pull-up
+resistor — the node only reads high once *every* domain has asserted
+good, which is exactly the condition the TRM requires before enabling
+VCCO. Feed that combined node into the EN pin of each carrier-side VCCO
+regulator (with a small RC for debounce/glitch filtering). No extra
+sequencing logic IC needed — this is what open-drain power-good outputs
+are for. Not yet in KiCad; the module-side `EN_*` signals (`EN_PL`,
+`EN_DD`, `EN_PS`, `EN_GT` — some domains are apparently carrier-enabled,
+not purely module-internal) also need reading more carefully before
+this circuit is finalized, since they suggest the carrier has more
+active control over sequencing than "just wait for PG" implies.
 
 ## Not yet designed (real schematic work, not done here)
 
@@ -255,8 +282,9 @@ still owns:
   schematic capture starts, as a final sanity check on this
   architecture-level analysis — not expected to change the outcome, but
   worth doing before pins are committed to copper.
-- Finalize the TMDS-line ESD array part against a real signal-integrity
-  budget (only flagged as "needs a low-capacitance part," not picked).
-- Design the power-good-gated sequencing circuit for carrier VCCO rails.
+- Confirm ESD8040 (vs. ESD7104) as the TMDS ESD part against real specs.
+- Re-read the TRM's `PG_PSG`/`PG_GT_`/`EN_*` rows closely before
+  finalizing the sequencing circuit — "External" pull-up note and the
+  carrier-facing `EN_*` signals need more than this pass's skim.
 - No SOM purchase has been made yet. This doc is the basis for a
   decision, not a confirmation of one.
