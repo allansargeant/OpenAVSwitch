@@ -1,5 +1,13 @@
 # OpenAVSwitch
 
+> **AI-assisted project.** This codebase was created with [Claude](https://claude.com/claude-code)
+> (Anthropic), directed and reviewed by a human author. Treat this as you
+> would any early-stage hobby/community hardware project: nothing here has
+> been through professional design review, third-party audit, or
+> real-hardware validation yet (see [Status](#status) below). Read the
+> design docs and RTL critically, especially before relying on this for
+> anything beyond simulation.
+
 An open, modular AV processing mainframe in the spirit of the Analog Way
 Aquilon / Barco E3 class of live-event video processors: multiple
 simultaneous inputs, multi-layer real-time compositing/scaling, and seamless
@@ -18,15 +26,6 @@ bandwidth once its HPS Linux bridge is accounted for, so it's the wrong
 technical base for this project regardless; everything in `rtl/` and
 `docs/` here is original, targeting Xilinx/AMD Zynq UltraScale+ instead.
 See [docs/architecture.md](docs/architecture.md) for the full reasoning.
-
-**AI involvement:** the RTL, testbenches, and documentation in this
-repository are being written collaboratively with AI assistance (Claude
-Code), directed and reviewed by a human author. Treat this as you would
-any early-stage hobby/community hardware project: nothing here has been
-through professional design review, third-party audit, or real-hardware
-validation yet (see [Status](#status) below). Read the design docs and
-RTL critically, especially before relying on this for anything beyond
-simulation.
 
 ![Phase 1 signal path: 4x asynchronous HDMI inputs through per-channel capture and scaling into a frame-boundary-latched seamless switch, out to 1x HDMI output](docs/diagrams/phase1-blueprint.svg)
 
