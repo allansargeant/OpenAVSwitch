@@ -57,6 +57,18 @@ scale -> crossbar -> output pipeline before any of the modularity
 layered on. Details in [docs/phase1-plan.md](docs/phase1-plan.md) and
 [docs/roadmap.md](docs/roadmap.md).
 
+## Roadmap / TODO
+
+Full phased plan in [docs/roadmap.md](docs/roadmap.md). At a glance:
+
+- [x] **Phase 0** — Architecture & specs
+- [ ] **Phase 1** — 4-in / 1-out HDMI 4K seamless switcher *(logic/simulation track done; carrier-board hardware not yet built, synthesized, or run on silicon)*
+- [ ] **Phase 2** — Multi-layer compositing
+- [ ] **Phase 3** — Modular I/O daughtercards
+- [ ] **Phase 4** — Chassis / card-cage productization
+- [ ] **Phase 5** — Third-party capture card support (e.g. Blackmagic DeckLink)
+- [ ] **Phase 6** — 8K
+
 ## Repo layout
 
 - `docs/` — architecture, specs, roadmap
