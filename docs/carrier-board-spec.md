@@ -176,9 +176,19 @@ Ethernet PHY on RGMII from the PS, no PCIe on this board rev.
   open-drain/level-shifted GPIO.
 - **CEC**: optional, deferred — not required for basic capture/display
   and skipping it simplifies the first revision.
-- **ESD protection**: a dedicated HDMI ESD array IC at the connector
-  (e.g. ON Semi NUF2042-class) across TMDS + DDC + HPD lines — standard,
-  cheap, and connector-adjacent placement matters for effectiveness.
+- **ESD protection — new recommendation, part confirmed but pinout still
+  needed**: **Semtech RClamp0574P**, confirmed directly from Semtech's
+  own product page (not just search snippets) as explicitly rated for
+  "HDMI 1.4, HDMI 1.4b and HDMI 2.0," 4 high-speed lines per package,
+  5-pin SLP2010N5 (2.0x1.0x0.5mm). Protects 2 differential pairs each,
+  so 2 chips cover all 4 pairs (3 TMDS + clock) — supersedes ESD8040,
+  which was both inaccessible *and* only inferred (not stated) as
+  4K60-capable. **Exact pin-by-pin numbering still not obtained** — a
+  dedicated datasheet PDF didn't surface in this pass (only the product
+  page and a sibling part's LCSC listing, neither with a full pin table)
+  — not fabricated, needs sourcing directly from Semtech/a distributor
+  before schematic capture. DDC/HPD/CEC (slower, less critical): ordinary
+  array, e.g. SM712-class.
 - **EDID**: recommend **FPGA-driven emulation** (a soft I2C slave under
   our own control) over a fixed pre-programmed EEPROM. A static EEPROM
   can't tell a source "yes, I support this specific custom timing" —
@@ -208,17 +218,20 @@ README for what's real vs. still open):
   spec, unchanged) now points at a real footprint copied from KiCad's
   own library (`HDMI_A_Amphenol_10029449-x01xLF_Horizontal`), pad names
   (1-19 + `SH`) cross-checked against the symbol's pins. Done.
-- **ESD protection (ESD8040): genuinely blocked, not transcribed.**
-  5+ attempts across onsemi.com (403), Mouser/Farnell PDFs (timeout, or
-  wrong document — one attempt returned the unrelated ESD8351
-  datasheet), DigiKey's HTML version (410 Gone), and web archive
-  (blocked entirely) all failed to produce the actual pin-by-pin table.
-  General marketing copy ("14 lines," "UDFN14," "5.5x1.5mm," "0.5mm
-  pitch") is corroborated across multiple sources, but the specific
-  pin-number-to-signal mapping is not, and that's the part that matters
-  for a real BOM — **not fabricated rather than guessed**. Needs either
-  the user sourcing the datasheet directly, or picking a different ESD
-  part whose datasheet is actually accessible.
+- **ESD protection: switched from ESD8040 to Semtech RClamp0574P.**
+  ESD8040 remained genuinely blocked (5+ attempts across onsemi.com
+  403s, Mouser/Farnell timeouts or wrong documents, DigiKey 410 Gone,
+  web archive blocked entirely — never got the pin table). RClamp0574P
+  is a real improvement, not just a swap: Semtech's own product page
+  *explicitly* lists HDMI 2.0 support (ESD8040's HDMI-2.0 fitness was
+  only ever inferred from its own eye-diagram plots, never a direct
+  claim). Still missing: the exact pin table — a full datasheet PDF
+  didn't surface for this specific part either, so it's not
+  schematic-ready, but it's a strictly better starting point (real,
+  correctly-rated, just needs the datasheet tracked down) than ESD8040
+  was. Also considered TI TPD12S016 (well-documented, datasheet
+  obtained) but ruled it out — confirmed explicitly HDMI 1.4-only in
+  its own datasheet, same rate mismatch problem as the earlier ESD7104.
 
 ## Power
 

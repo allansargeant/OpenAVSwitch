@@ -2,7 +2,9 @@
 
 Status: **all 4 SOM connectors + level translators + clock generator +
 power sequencing circuit placed and validated; real HDMI connector part
-resolved. Only ESD8040 remains genuinely blocked.** Design content lives
+resolved; ESD protection switched to a correctly-rated real part
+(Semtech RClamp0574P) though its exact pin table is still unsourced.**
+Design content lives
 in [../../docs/carrier-board-spec.md](../../docs/carrier-board-spec.md) —
 read that first.
 
@@ -54,13 +56,16 @@ never run on it. This was previously (wrongly) flagged as needing a
 GUI check — it doesn't; the underlying data was always fine once you
 know not to run the corrupting command.
 
-**Genuinely blocked, not transcribed: ESD8040.** 5+ fetch attempts
-across onsemi.com (403), Mouser/Farnell (timeout, or once returned an
-unrelated part's datasheet — ESD8351 — caught before it was used), 
-DigiKey's HTML page (410 Gone), and web archive (blocked entirely) all
-failed to produce the actual pin table. Not fabricated as a workaround.
-Needs the user to source the datasheet directly, or a different ESD part
-with an accessible one.
+**ESD8040 → switched to Semtech RClamp0574P, still not schematic-ready.**
+ESD8040 stayed blocked (5+ fetch attempts across onsemi.com 403,
+Mouser/Farnell timeouts or a wrong-document PDF caught before use,
+DigiKey 410 Gone, web archive blocked entirely). RClamp0574P is a real
+improvement: confirmed directly from Semtech's own product page as
+explicitly HDMI 2.0-rated (ESD8040's 4K60 fitness was only ever
+inferred, never stated outright). Its exact pin table still didn't
+surface though — not fabricated, needs sourcing before use in a
+schematic. Also checked TI TPD12S016 (well-documented) and ruled it out:
+confirmed HDMI 1.4-only in its own datasheet.
 
 **Resolved**: an earlier research pass named "Amphenol
 GSD1S211-K1E1-4030" as the HDMI connector, which never verified as real.
@@ -90,8 +95,9 @@ the corrupting `upgrade` step is avoided.
 
 ## Next steps
 
-1. Source the ESD8040 datasheet (or pick an alternative ESD part — the
-   only genuinely blocked item left).
+1. Source RClamp0574P's actual pin table (part confirmed real and
+   correctly rated, just the datasheet itself — the only genuinely
+   blocked item left).
 2. Populate `hdmi_in*.kicad_sch` / `hdmi_out.kicad_sch` with the (now
    resolved) HDMI connector, ESD protection once 1 is resolved, and EDID
    circuitry.
