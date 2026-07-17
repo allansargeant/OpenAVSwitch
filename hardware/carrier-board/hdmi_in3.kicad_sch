@@ -761,6 +761,69 @@
 			(embedded_fonts no)
 		)
 	)
+	(wire
+		(pts
+			(xy 25.4 85.09) (xy 81.28 85.09)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "844065f5-a913-4b11-89bd-19a3f5dffabf")
+	)
+	(wire
+		(pts
+			(xy 81.28 85.09) (xy 81.28 99.06)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "b52ad0a3-4bed-4ee6-88a6-e9cdf4bf4277")
+	)
+	(wire
+		(pts
+			(xy 81.28 87.63) (xy 81.28 96.52)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "ce92a768-8328-47ba-8802-1b8805279c94")
+	)
+	(wire
+		(pts
+			(xy 25.4 87.63) (xy 81.28 87.63)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "e6f28b7e-c37a-414f-be9e-cab06e3eebac")
+	)
+	(global_label "HDMI_IN3_SDA_3V3"
+		(shape input)
+		(at 81.28 106.68 0)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "9d382286-a5af-4458-935c-89211cc8f608")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 81.28 106.68 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+	)
 	(global_label "+3V3"
 		(shape input)
 		(at 116.84 86.36 0)
@@ -797,6 +860,29 @@
 		(uuid "d6a6e7f4-228c-48e4-ab3b-ded4c6159a57")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
 			(at 116.84 111.76 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+	)
+	(global_label "HDMI_IN3_SCL_3V3"
+		(shape input)
+		(at 81.28 104.14 0)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "f96fa0dd-10ea-4532-af7f-c0535812dd13")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 81.28 104.14 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)

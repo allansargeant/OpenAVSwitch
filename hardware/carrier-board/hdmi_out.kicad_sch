@@ -761,6 +761,46 @@
 			(embedded_fonts no)
 		)
 	)
+	(wire
+		(pts
+			(xy 25.4 85.09) (xy 81.28 85.09)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "2adb6d04-771d-47b1-9ffa-750cd9392e00")
+	)
+	(wire
+		(pts
+			(xy 25.4 87.63) (xy 81.28 87.63)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "40a15462-2b26-4c6f-b212-fc4824273c6d")
+	)
+	(wire
+		(pts
+			(xy 81.28 87.63) (xy 81.28 96.52)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "46b3c759-a5fc-44ad-8378-ba79767b2dd8")
+	)
+	(wire
+		(pts
+			(xy 81.28 85.09) (xy 81.28 99.06)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "9ffd8d34-54c2-4d11-96c3-3dfe71cc7f6a")
+	)
 	(global_label "GND"
 		(shape input)
 		(at 116.84 111.76 0)
@@ -820,6 +860,52 @@
 		(uuid "993a37bc-d82b-4c80-8801-33dd930c004d")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
 			(at 116.84 86.36 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+	)
+	(global_label "HDMI_OUT_SCL_3V3"
+		(shape input)
+		(at 81.28 104.14 0)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "b0ed2047-9bb0-4805-939b-d7ef69ed2e3c")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 81.28 104.14 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+	)
+	(global_label "HDMI_OUT_SDA_3V3"
+		(shape input)
+		(at 81.28 106.68 0)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "c354e9cb-607d-43a9-868c-c446cc30122a")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 81.28 106.68 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)

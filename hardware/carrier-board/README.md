@@ -3,7 +3,9 @@
 Status: **all 4 SOM connectors + level translators + clock generator +
 power sequencing circuit placed and validated; real HDMI connector part
 resolved and placed in all 4 HDMI sheets; TXS0102 level-translator power
-pins (VCCA/VCCB/GND) wired to +3V3/GND in all 4 HDMI sheets; ESD
+pins (VCCA/VCCB/GND) wired to +3V3/GND, and the DDC (SCL/SDA) signal
+path from the HDMI connector through the level translator to a
+per-sheet-unique 3V3-side net wired, in all 4 HDMI sheets; ESD
 protection switched to a correctly-rated real part (Semtech RClamp0574P)
 though its exact pin table is still unsourced.**
 Design content lives
@@ -78,12 +80,20 @@ DigiKey and matched against KiCad's own footprint library — see above.
 
 - `hdmi_in1.kicad_sch`, `hdmi_in2.kicad_sch`, `hdmi_in3.kicad_sch`,
   `hdmi_out.kicad_sch` — each has a TXS0102DCUR (U1) and the real
-  HDMI_TypeA_Receptacle connector (J1) placed, plus J1's DDC/HPD-side
-  level-translator power pins wired: U1 VCCA/VCCB → `+3V3`, U1 GND →
-  `GND` (global labels, coincident with the pin's connection point,
-  same label-coincidence technique as `power.kicad_sch`). J1's own
-  power pins (PLUS5V, DDC_CEC_GND, SHELL) and all TMDS/DDC/HPD signal
-  nets are still unwired — next step.
+  HDMI_TypeA_Receptacle connector (J1) placed. U1's power pins are
+  wired: VCCA/VCCB → `+3V3`, GND → `GND` (global labels, coincident
+  with the pin's connection point, same label-coincidence technique as
+  `power.kicad_sch`). The DDC signal path is wired end-to-end on the
+  5V side: J1 pin 15 (SCL) and pin 16 (SDA) connect via real wires to
+  U1's A-side pins A1/A2; U1's B-side pins B1/B2 (3.3V side) connect to
+  per-sheet-unique global labels (`HDMI_IN1_SCL_3V3`/`_SDA_3V3`,
+  `HDMI_IN2_...`, etc — deliberately **not** the same net name across
+  sheets, since each HDMI port's DDC bus must stay electrically
+  independent) ready to extend to the SOM connector's I2C GPIO pins
+  once those are pin-planned. J1's own power pins (PLUS5V,
+  DDC_CEC_GND, SHELL), HPD (pin 19, still an open design decision —
+  see carrier-board-spec.md), and all TMDS signal nets are still
+  unwired — next step.
 - `clocking.kicad_sch` — Si5341A placed and validated, single-unit
   symbol so it avoided the multi-unit quirk below entirely.
 - `som_connector.kicad_sch` — **J1, J2, J3, J4** all placed (Samtec
@@ -139,16 +149,19 @@ matters later.
 1. Source RClamp0574P's actual pin table (part confirmed real and
    correctly rated, just the datasheet itself — the only genuinely
    blocked item left).
-2. Wire the TMDS/DDC/HPD signal nets between J1 and U1 (the connector
-   is placed, U1's power pins are wired, but the actual level-translated
-   DDC/HPD signal path between them is not yet connected), add ESD
-   protection once 1 is resolved, and EDID circuitry.
+2. Decide and wire HPD (open design decision — double-duty on a level
+   translator isn't available anymore since both TXS0102 channels are
+   now used for DDC, so it needs its own simple open-drain/level-shifted
+   GPIO circuit per carrier-board-spec.md), wire the TMDS signal nets,
+   add ESD protection once 1 is resolved, and EDID circuitry.
 3. Design `power.kicad_sch`'s VCCO regulators themselves (the sequencing
    circuit driving their EN pins is done — see above) once specific
    regulator parts are chosen.
-4. Wire the remaining nets between placed components — TMDS/clock pairs
-   from J1/clocking to the GTH-facing SOM connector pins are still
-   unconnected.
+4. Route the DDC 3V3-side nets (`HDMI_IN1_SCL_3V3` etc, currently
+   single-pin nets by design — see the `isolated_pin_label` ERC warnings,
+   expected and benign until this is done) and the TMDS/clock pairs from
+   J1/clocking, on to the GTH-facing SOM connector pins, once real pin
+   assignments exist.
 5. Confirm the GTH allocation at the Vivado pin-planner level once real
    pin assignments start.
 6. Optional cosmetic cleanup: reposition J2-J4 or resize the paper so
