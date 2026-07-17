@@ -156,9 +156,13 @@ Ethernet PHY on RGMII from the PS, no PCIe on this board rev.
 
 ## HDMI connector-side circuitry (per port, standard practice — not yet in KiCad)
 
-- **Connector**: standard 19-pin Type-A HDMI receptacle — specific
-  manufacturer part still TBD (see below; an earlier "Amphenol
-  GSD1S211-K1E1-4030" pick couldn't be verified as real).
+- **Connector — resolved with a real, verified part**: **Amphenol ICC
+  (FCI) 10029449-001RLF** family (19-pin Type-A, right-angle, SMT+through-
+  hole shield), confirmed in stock on DigiKey — supersedes the earlier
+  unverified "GSD1S211-K1E1-4030" claim. Footprint copied directly from
+  KiCad's own `Connector_Video.pretty` library
+  (`HDMI_A_Amphenol_10029449-x01xLF_Horizontal`), pad names (1-19 + `SH`
+  for shell) cross-checked against the symbol's pin numbers.
 - **TMDS 3 data pairs**: AC-coupled (100nF 0402, standard for GTH RX
   inputs) straight to the SOM's GTH RX pins — no receiver chip, per the
   native-capture requirement. Xilinx's own placement guidance is to keep
@@ -197,18 +201,13 @@ README for what's real vs. still open):
   (`QFN-64-1EP_9x9mm_P0.5mm_EP5.2x5.2mm`, dimensions confirmed against
   the datasheet's Table 18). Symbol validated, **placed in
   clocking.kicad_sch**. Done.
-- **HDMI connector — part number correction needed**: the earlier
-  "Amphenol GSD1S211-K1E1-4030" pick from a previous research pass
-  **could not be verified as a real part number** in this pass — it
-  never turned up in any search, on Amphenol's own site, or anywhere
-  else, despite a genuine effort. Treat that specific part number as
-  unconfirmed/likely wrong. What *is* solid: HDMI Type-A's 19-pin
-  electrical pinout is defined by the public HDMI specification, not
-  proprietary to any manufacturer, so a **generic `HDMI_TypeA_Receptacle`
-  symbol** (20 pins incl. shell) was built from that public pinout with
-  high confidence and validated. **No footprint yet** — a real
-  manufacturer part (Amphenol, Molex, Kycon, etc.) still needs picking
-  and its actual mechanical footprint sourced before layout.
+- **HDMI connector — now resolved with a real, verified part**: earlier
+  "Amphenol GSD1S211-K1E1-4030" was unverifiable and wrong. Replaced with
+  **Amphenol ICC (FCI) 10029449-001RLF** (confirmed in stock on DigiKey)
+  — `HDMI_TypeA_Receptacle` symbol's electrical pinout (public HDMI
+  spec, unchanged) now points at a real footprint copied from KiCad's
+  own library (`HDMI_A_Amphenol_10029449-x01xLF_Horizontal`), pad names
+  (1-19 + `SH`) cross-checked against the symbol's pins. Done.
 - **ESD protection (ESD8040): genuinely blocked, not transcribed.**
   5+ attempts across onsemi.com (403), Mouser/Farnell PDFs (timeout, or
   wrong document — one attempt returned the unrelated ESD8351

@@ -33,7 +33,7 @@
 				(justify left bottom)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "carrier_footprints:HDMI_A_Amphenol_10029449-x01xLF_Horizontal"
 			(at 0 0 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -55,7 +55,7 @@
 				)
 			)
 		)
-		(property "Description" "Generic HDMI Type-A receptacle, 19 signal pins + shell. Pinout per the public HDMI specification (manufacturer-independent), NOT transcribed from a specific vendor datasheet -- the earlier 'Amphenol GSD1S211-K1E1-4030' part number could not be verified as real (didn't turn up in any search) and should be treated as unconfirmed. No footprint assigned -- pick a specific manufacturer part (Amphenol/Molex/Kycon etc.) and its real mechanical footprint before layout; this symbol only fixes the electrical pinout."
+		(property "Description" "HDMI Type-A receptacle, 19 signal pins + SH (shell). Electrical pinout per the public HDMI spec (manufacturer-independent). Footprint: real, verified part -- Amphenol ICC (FCI) 10029449-001RLF family (confirmed on DigiKey, in stock), footprint copied from KiCad's own Connector_Video.pretty library (HDMI_A_Amphenol_10029449-x01xLF_Horizontal), pad names cross-checked (1-19 + SH) against the symbol's pin numbers. Supersedes an earlier unverified 'Amphenol GSD1S211-K1E1-4030' claim -- that part number never corroborated in search and should be treated as wrong."
 			(at 0 0 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -432,7 +432,7 @@
 						)
 					)
 				)
-				(number "20"
+				(number "SH"
 					(effects
 						(font
 							(size 1.016 1.016)

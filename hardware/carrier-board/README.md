@@ -1,9 +1,9 @@
 # Carrier board (KiCad project)
 
-Status: **all 4 SOM connectors + level translators + clock generator
-placed and validated; ESD8040 genuinely blocked; real HDMI connector
-part still needed.** Design content lives in
-[../../docs/carrier-board-spec.md](../../docs/carrier-board-spec.md) —
+Status: **all 4 SOM connectors + level translators + clock generator +
+power sequencing circuit placed and validated; real HDMI connector part
+resolved. Only ESD8040 remains genuinely blocked.** Design content lives
+in [../../docs/carrier-board-spec.md](../../docs/carrier-board-spec.md) —
 read that first.
 
 ## Scope of this board
@@ -26,10 +26,12 @@ hand-transcribed from primary datasheets, none placeholders:
   matched to KiCad's own standard `QFN-64-1EP_9x9mm_P0.5mm_EP5.2x5.2mm`
   (verified against the datasheet's Table 18 dimensions, copied in from
   the local KiCad install's official library).
-- `libs/symbols/HDMI_TypeA_Receptacle.kicad_sym` — **hand-built from the
-  public HDMI specification's pinout** (manufacturer-independent, so
-  high confidence), not tied to a specific manufacturer part. **No
-  footprint yet** — see below.
+- `libs/symbols/HDMI_TypeA_Receptacle.kicad_sym` — pinout hand-built from
+  the public HDMI specification (manufacturer-independent, high
+  confidence), **footprint now resolved**: Amphenol ICC (FCI)
+  10029449-001RLF (confirmed in stock on DigiKey), footprint copied from
+  KiCad's own `Connector_Video.pretty` library, pad names (1-19 + `SH`)
+  cross-checked against the symbol's pins.
 - `libs/footprints.pretty/` — matching footprints; `libs/3dmodels/` —
   STEP models where available.
 - `sym-lib-table` / `fp-lib-table` — project-local library tables.
@@ -60,13 +62,10 @@ failed to produce the actual pin table. Not fabricated as a workaround.
 Needs the user to source the datasheet directly, or a different ESD part
 with an accessible one.
 
-**Correction**: an earlier research pass named "Amphenol
-GSD1S211-K1E1-4030" as the HDMI connector. That part number **could not
-be verified as real** in this pass — never turned up anywhere. Treat it
-as wrong. The `HDMI_TypeA_Receptacle` symbol above uses the public
-HDMI pinout instead, sidestepping the need for a specific (possibly
-fictional) part number for the *symbol* — but a real manufacturer part
-and its real footprint still need picking before layout.
+**Resolved**: an earlier research pass named "Amphenol
+GSD1S211-K1E1-4030" as the HDMI connector, which never verified as real.
+Replaced with Amphenol ICC (FCI) 10029449-001RLF, cross-verified on
+DigiKey and matched against KiCad's own footprint library — see above.
 
 ## What's placed
 
@@ -91,15 +90,18 @@ the corrupting `upgrade` step is avoided.
 
 ## Next steps
 
-1. Source the ESD8040 datasheet (or pick an alternative ESD part) and a
-   real HDMI connector manufacturer part + footprint.
-2. Populate `hdmi_in*.kicad_sch` / `hdmi_out.kicad_sch` with the
-   connector, ESD protection, and EDID circuitry once 1 is resolved.
-3. Design `power.kicad_sch`'s regulation + power-good sequencing circuit
-   (fully specified in carrier-board-spec.md, not drawn yet).
+1. Source the ESD8040 datasheet (or pick an alternative ESD part — the
+   only genuinely blocked item left).
+2. Populate `hdmi_in*.kicad_sch` / `hdmi_out.kicad_sch` with the (now
+   resolved) HDMI connector, ESD protection once 1 is resolved, and EDID
+   circuitry.
+3. Design `power.kicad_sch`'s VCCO regulators themselves (the sequencing
+   circuit driving their EN pins is done — see above) once specific
+   regulator parts are chosen.
 4. Actually wire nets between placed components — nothing is connected
-   yet, only placed.
+   across sheets yet, only placed/self-contained per sheet.
 5. Confirm the GTH allocation at the Vivado pin-planner level once real
    pin assignments start.
 6. Optional cosmetic cleanup: reposition J2-J4 or resize the paper so
-   som_connector.kicad_sch fits visually on one printable page.
+   som_connector.kicad_sch fits visually on one printable page; offset
+   the overlapping label pairs in power.kicad_sch for readability.
