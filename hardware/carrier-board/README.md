@@ -1,7 +1,8 @@
 # Carrier board (KiCad project)
 
-Status: **most parts placed, one part genuinely blocked.** Design
-content lives in
+Status: **all 4 SOM connectors + level translators + clock generator
+placed and validated; ESD8040 genuinely blocked; real HDMI connector
+part still needed.** Design content lives in
 [../../docs/carrier-board-spec.md](../../docs/carrier-board-spec.md) —
 read that first.
 
@@ -36,6 +37,21 @@ hand-transcribed from primary datasheets, none placeholders:
 Every symbol/footprint (downloaded or transcribed) was validated through
 `kicad-cli sym/fp upgrade` before use, not trusted blind.
 
+**Important validation note, learned the hard way**: `kicad-cli sch
+upgrade` is safe for single-unit symbols but **actively corrupts
+multi-unit symbol instances** (it collapsed both units of a 2-unit
+connector to `unit 1` and, worse, ballooned each instance from 80 to all
+160 pins — a real bug, not cosmetic). Confirmed by regenerating from
+scratch and checking pin data *before* running `upgrade`: correct (80
+pins/unit) pre-upgrade, corrupted (160 pins/unit, `different_unit_net`
+ERC errors) post-upgrade. **Fix: never run `sch upgrade` on files with
+multi-unit symbol instances — validate with `sch erc` alone instead**,
+which is read-only and reports correctly. `som_connector.kicad_sch` was
+regenerated clean and is validated via `sch erc` only, `sch upgrade` is
+never run on it. This was previously (wrongly) flagged as needing a
+GUI check — it doesn't; the underlying data was always fine once you
+know not to run the corrupting command.
+
 **Genuinely blocked, not transcribed: ESD8040.** 5+ fetch attempts
 across onsemi.com (403), Mouser/Farnell (timeout, or once returned an
 unrelated part's datasheet — ESD8351 — caught before it was used), 
@@ -58,32 +74,32 @@ and its real footprint still need picking before layout.
   `hdmi_out.kicad_sch` — each has a TXS0102DCUR placed and validated.
 - `clocking.kicad_sch` — Si5341A placed and validated, single-unit
   symbol so it avoided the multi-unit quirk below entirely.
-- `som_connector.kicad_sch` — **J1** (Samtec SS5-80-3.50-L-D-K-TR, 160
-  pins) placed. Known quirk: the part's symbol is split into 2 units (80
-  pins each, one per connector row), and `kicad-cli sch upgrade`
-  collapses both placed instances to `(unit 1)` during normalization.
-  **Verified this doesn't lose or duplicate any pin data** (all 160
-  numbers present, unique, correctly mapped) — cosmetic/organizational,
-  not a netlist bug, but couldn't fix it without KiCad's interactive
-  GUI. **Please open this sheet in KiCad and check the unit assignment**
-  before J2-J4 get added the same way.
+- `som_connector.kicad_sch` — **J1, J2, J3, J4** all placed (Samtec
+  SS5-80-3.50-L-D-K-TR x4, 160 pins each, correctly split 80/80 across
+  each connector's 2 units). Verified clean via `sch erc` (see note
+  above — do not run `sch upgrade` on this file). One minor cosmetic
+  item, not a correctness issue: J2/J3/J4 are positioned beyond a single
+  A4 page's visible bounds (each 80-pin column is ~200mm tall, so 4
+  stacked connectors don't fit one page) — fine for ERC/netlist, but
+  worth spacing out differently or moving to a larger paper size for
+  anyone reading this visually in the GUI.
 
 Full-hierarchy `kicad-cli sch erc` shows only expected violations
-(unconnected pins on placed-but-unwired components, and the known J1
-unit quirk above) — no unexplained structural errors anywhere.
+(unconnected pins on placed-but-unwired components) — no unexplained
+structural errors anywhere, and no `different_unit_net` errors now that
+the corrupting `upgrade` step is avoided.
 
 ## Next steps
 
-1. **You**: check `som_connector.kicad_sch`'s J1 unit assignment in real
-   KiCad (see above).
-2. Replicate J1's placement pattern to J2, J3, J4 once 1 is resolved.
-3. Source the ESD8040 datasheet (or pick an alternative ESD part) and a
+1. Source the ESD8040 datasheet (or pick an alternative ESD part) and a
    real HDMI connector manufacturer part + footprint.
-4. Populate `hdmi_in*.kicad_sch` / `hdmi_out.kicad_sch` with the
-   connector, ESD protection, and EDID circuitry once 3 is resolved.
-5. Design `power.kicad_sch`'s regulation + power-good sequencing circuit
+2. Populate `hdmi_in*.kicad_sch` / `hdmi_out.kicad_sch` with the
+   connector, ESD protection, and EDID circuitry once 1 is resolved.
+3. Design `power.kicad_sch`'s regulation + power-good sequencing circuit
    (fully specified in carrier-board-spec.md, not drawn yet).
-6. Actually wire nets between placed components — nothing is connected
+4. Actually wire nets between placed components — nothing is connected
    yet, only placed.
-7. Confirm the GTH allocation at the Vivado pin-planner level once real
+5. Confirm the GTH allocation at the Vivado pin-planner level once real
    pin assignments start.
+6. Optional cosmetic cleanup: reposition J2-J4 or resize the paper so
+   som_connector.kicad_sch fits visually on one printable page.
