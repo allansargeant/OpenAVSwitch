@@ -10,6 +10,447 @@
 		(comment 1 "DDC/HPD level translator placed (TXS0102DCUR). TMDS/connector/ESD/EDID still to add.")
 	)
 	(lib_symbols
+		(symbol "HDMI_TypeA_Receptacle:HDMI_TypeA_Receptacle"
+			(pin_names
+				(offset 1.016)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(in_pos_files yes)
+			(duplicate_pin_numbers_are_jumpers no)
+			(property "Reference" "J"
+				(at -25.4 34.67 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(justify left bottom)
+				)
+			)
+			(property "Value" "HDMI_TypeA_Receptacle"
+				(at -25.4 -34.67 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(justify left bottom)
+				)
+			)
+			(property "Footprint" "carrier_footprints:HDMI_A_Amphenol_10029449-x01xLF_Horizontal"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Datasheet" ""
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Description" "HDMI Type-A receptacle, 19 signal pins + SH (shell). Electrical pinout per the public HDMI spec (manufacturer-independent). Footprint: real, verified part -- Amphenol ICC (FCI) 10029449-001RLF family (confirmed on DigiKey, in stock), footprint copied from KiCad's own Connector_Video.pretty library (HDMI_A_Amphenol_10029449-x01xLF_Horizontal), pad names cross-checked (1-19 + SH) against the symbol's pin numbers. Supersedes an earlier unverified 'Amphenol GSD1S211-K1E1-4030' claim -- that part number never corroborated in search and should be treated as wrong."
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(symbol "HDMI_TypeA_Receptacle_0_1"
+				(rectangle
+					(start -20.32 -26.67)
+					(end 20.32 26.67)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type background)
+					)
+				)
+			)
+			(symbol "HDMI_TypeA_Receptacle_1_1"
+				(pin input line
+					(at -25.4 -24.13 0)
+					(length 5.08)
+					(name "TMDS_DATA2P"
+						(effects
+							(font
+								(size 1.016 1.016)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.016 1.016)
+							)
+						)
+					)
+				)
+				(pin power_in line
+					(at -25.4 -21.59 0)
+					(length 5.08)
+					(name "TMDS_DATA2_SHIELD"
+						(effects
+							(font
+								(size 1.016 1.016)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.016 1.016)
+							)
+						)
+					)
+				)
+				(pin input line
+					(at -25.4 -19.05 0)
+					(length 5.08)
+					(name "TMDS_DATA2N"
+						(effects
+							(font
+								(size 1.016 1.016)
+							)
+						)
+					)
+					(number "3"
+						(effects
+							(font
+								(size 1.016 1.016)
+							)
+						)
+					)
+				)
+				(pin input line
+					(at -25.4 -16.51 0)
+					(length 5.08)
+					(name "TMDS_DATA1P"
+						(effects
+							(font
+								(size 1.016 1.016)
+							)
+						)
+					)
+					(number "4"
+						(effects
+							(font
+								(size 1.016 1.016)
+							)
+						)
+					)
+				)
+				(pin power_in line
+					(at -25.4 -13.97 0)
+					(length 5.08)
+					(name "TMDS_DATA1_SHIELD"
+						(effects
+							(font
+								(size 1.016 1.016)
+							)
+						)
+					)
+					(number "5"
+						(effects
+							(font
+								(size 1.016 1.016)
+							)
+						)
+					)
+				)
+				(pin input line
+					(at -25.4 -11.43 0)
+					(length 5.08)
+					(name "TMDS_DATA1N"
+						(effects
+							(font
+								(size 1.016 1.016)
+							)
+						)
+					)
+					(number "6"
+						(effects
+							(font
+								(size 1.016 1.016)
+							)
+						)
+					)
+				)
+				(pin input line
+					(at -25.4 -8.89 0)
+					(length 5.08)
+					(name "TMDS_DATA0P"
+						(effects
+							(font
+								(size 1.016 1.016)
+							)
+						)
+					)
+					(number "7"
+						(effects
+							(font
+								(size 1.016 1.016)
+							)
+						)
+					)
+				)
+				(pin power_in line
+					(at -25.4 -6.35 0)
+					(length 5.08)
+					(name "TMDS_DATA0_SHIELD"
+						(effects
+							(font
+								(size 1.016 1.016)
+							)
+						)
+					)
+					(number "8"
+						(effects
+							(font
+								(size 1.016 1.016)
+							)
+						)
+					)
+				)
+				(pin input line
+					(at -25.4 -3.81 0)
+					(length 5.08)
+					(name "TMDS_DATA0N"
+						(effects
+							(font
+								(size 1.016 1.016)
+							)
+						)
+					)
+					(number "9"
+						(effects
+							(font
+								(size 1.016 1.016)
+							)
+						)
+					)
+				)
+				(pin input line
+					(at -25.4 -1.27 0)
+					(length 5.08)
+					(name "TMDS_CLKP"
+						(effects
+							(font
+								(size 1.016 1.016)
+							)
+						)
+					)
+					(number "10"
+						(effects
+							(font
+								(size 1.016 1.016)
+							)
+						)
+					)
+				)
+				(pin power_in line
+					(at -25.4 1.27 0)
+					(length 5.08)
+					(name "TMDS_CLK_SHIELD"
+						(effects
+							(font
+								(size 1.016 1.016)
+							)
+						)
+					)
+					(number "11"
+						(effects
+							(font
+								(size 1.016 1.016)
+							)
+						)
+					)
+				)
+				(pin input line
+					(at -25.4 3.81 0)
+					(length 5.08)
+					(name "TMDS_CLKN"
+						(effects
+							(font
+								(size 1.016 1.016)
+							)
+						)
+					)
+					(number "12"
+						(effects
+							(font
+								(size 1.016 1.016)
+							)
+						)
+					)
+				)
+				(pin bidirectional line
+					(at -25.4 6.35 0)
+					(length 5.08)
+					(name "CEC"
+						(effects
+							(font
+								(size 1.016 1.016)
+							)
+						)
+					)
+					(number "13"
+						(effects
+							(font
+								(size 1.016 1.016)
+							)
+						)
+					)
+				)
+				(pin no_connect line
+					(at -25.4 8.89 0)
+					(length 5.08)
+					(name "RESERVED"
+						(effects
+							(font
+								(size 1.016 1.016)
+							)
+						)
+					)
+					(number "14"
+						(effects
+							(font
+								(size 1.016 1.016)
+							)
+						)
+					)
+				)
+				(pin bidirectional line
+					(at -25.4 11.43 0)
+					(length 5.08)
+					(name "SCL"
+						(effects
+							(font
+								(size 1.016 1.016)
+							)
+						)
+					)
+					(number "15"
+						(effects
+							(font
+								(size 1.016 1.016)
+							)
+						)
+					)
+				)
+				(pin bidirectional line
+					(at -25.4 13.97 0)
+					(length 5.08)
+					(name "SDA"
+						(effects
+							(font
+								(size 1.016 1.016)
+							)
+						)
+					)
+					(number "16"
+						(effects
+							(font
+								(size 1.016 1.016)
+							)
+						)
+					)
+				)
+				(pin power_in line
+					(at -25.4 16.51 0)
+					(length 5.08)
+					(name "DDC_CEC_GND"
+						(effects
+							(font
+								(size 1.016 1.016)
+							)
+						)
+					)
+					(number "17"
+						(effects
+							(font
+								(size 1.016 1.016)
+							)
+						)
+					)
+				)
+				(pin power_in line
+					(at -25.4 19.05 0)
+					(length 5.08)
+					(name "PLUS5V"
+						(effects
+							(font
+								(size 1.016 1.016)
+							)
+						)
+					)
+					(number "18"
+						(effects
+							(font
+								(size 1.016 1.016)
+							)
+						)
+					)
+				)
+				(pin output line
+					(at -25.4 21.59 0)
+					(length 5.08)
+					(name "HPD"
+						(effects
+							(font
+								(size 1.016 1.016)
+							)
+						)
+					)
+					(number "19"
+						(effects
+							(font
+								(size 1.016 1.016)
+							)
+						)
+					)
+				)
+				(pin power_in line
+					(at -25.4 24.13 0)
+					(length 5.08)
+					(name "SHELL"
+						(effects
+							(font
+								(size 1.016 1.016)
+							)
+						)
+					)
+					(number "SH"
+						(effects
+							(font
+								(size 1.016 1.016)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
 		(symbol "TXS0102DCUR:TXS0102DCUR"
 			(pin_names
 				(offset 1.016)
@@ -318,6 +759,198 @@
 				)
 			)
 			(embedded_fonts no)
+		)
+	)
+	(global_label "+3V3"
+		(shape input)
+		(at 116.84 86.36 0)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "a5362d75-154c-4628-8ccc-eeea2be93a12")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 116.84 86.36 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+	)
+	(global_label "GND"
+		(shape input)
+		(at 116.84 111.76 0)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "d6a6e7f4-228c-48e4-ab3b-ded4c6159a57")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 116.84 111.76 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+	)
+	(global_label "+3V3"
+		(shape input)
+		(at 116.84 83.82 0)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "fa04ab06-dcd7-4ec5-8d3d-31ffab095948")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 116.84 83.82 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "HDMI_TypeA_Receptacle:HDMI_TypeA_Receptacle")
+		(at 50.8 99.06 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "0df7b63c-e171-4b62-b8d6-0befff5782e1")
+		(property "Reference" "J1"
+			(at 50.8 69.06 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "HDMI_TypeA_Receptacle"
+			(at 50.8 129.06 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "carrier_footprints:HDMI_A_Amphenol_10029449-x01xLF_Horizontal"
+			(at 50.8 99.06 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 50.8 99.06 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 50.8 99.06 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "5dec87ef-00e9-4f5b-8901-74eddd6eb6ec")
+		)
+		(pin "2"
+			(uuid "9a4c3718-5def-45f0-a2bd-28da6e18264f")
+		)
+		(pin "3"
+			(uuid "5569d5f3-ce12-4292-a746-14283005249f")
+		)
+		(pin "4"
+			(uuid "6776ebd3-7741-4e7a-8649-76397795fa8f")
+		)
+		(pin "5"
+			(uuid "b4e606e0-96be-4b4e-a126-d516cbae64fe")
+		)
+		(pin "6"
+			(uuid "a15902e5-91aa-49e5-933f-647796780680")
+		)
+		(pin "7"
+			(uuid "f2c407e2-fe9b-43be-b053-9b3a40f92adf")
+		)
+		(pin "8"
+			(uuid "9727c7e9-5fab-4e6c-8d11-bb902c1f1d2b")
+		)
+		(pin "9"
+			(uuid "4eabc501-461f-4a9c-95af-63e5948bcffe")
+		)
+		(pin "10"
+			(uuid "1d3f0e61-2bc2-4406-bed7-3d30e0cb0edb")
+		)
+		(pin "11"
+			(uuid "57097eca-6df6-41ea-b59c-e3c67b90461c")
+		)
+		(pin "12"
+			(uuid "e2a5b1eb-ab8a-4625-a78c-417e505ee948")
+		)
+		(pin "13"
+			(uuid "eb6e0a4f-26a4-4282-9806-e40737771dfb")
+		)
+		(pin "14"
+			(uuid "fe777e00-f959-48d1-8ab9-71b83f2ace71")
+		)
+		(pin "15"
+			(uuid "84b5cd3b-66c0-4afa-b5ba-3fb5eac3c6ae")
+		)
+		(pin "16"
+			(uuid "98dbf046-470d-490a-b125-a7c9f821f50d")
+		)
+		(pin "17"
+			(uuid "bdeef1e4-2f8e-486a-9017-8c1a8e0e5b05")
+		)
+		(pin "18"
+			(uuid "d71c21dd-cd15-4b8d-8537-301e80e5fe98")
+		)
+		(pin "19"
+			(uuid "c355a9ca-4292-4180-9d37-b5fd4ba2d4af")
+		)
+		(pin "SH"
+			(uuid "f33a86f5-257f-4b01-a705-4dcc9d809747")
 		)
 	)
 	(symbol
