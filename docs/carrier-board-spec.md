@@ -275,8 +275,15 @@ signals" table, re-read in full rather than skimmed):
   carrier-facing — reading the table more carefully resolved the earlier
   worry that these implied more carrier-side control than they do.
 
-This circuit is now fully specified at the schematic level (signals,
-pins, pull-up values, topology) — just not drawn in KiCad yet.
+**Drawn in KiCad now** (`hardware/carrier-board/power.kicad_sch`): all 7
+`PG_*` signals, 3 pull-up resistors (10k to +3V3, values not yet
+optimized against the 1mA sink budget but within it), and the R4/C1
+debounce filter producing `VCCO_EN`. Validated via `sch erc` — clean
+except two expected warnings (the intentional label-based net merge, and
+`VCCO_EN` currently having only one consumer since no VCCO regulator
+exists yet to wire it to). One cosmetic issue, not fixed: the global and
+local labels sharing a coordinate render on top of each other in the
+GUI — legible topology, needs a visual offset for readability.
 
 ## Not yet designed (real schematic work, not done here)
 
