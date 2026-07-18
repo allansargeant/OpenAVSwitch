@@ -191,12 +191,25 @@ capture standpoint — a final Vivado pin-planner pass before ordering
 copper is still worthwhile as a sanity check (per the open items list
 below) but is no longer a blocker for wiring the carrier board.
 
-## Open question: TMDS_CLK routing (found while wiring, not yet resolved)
+## TMDS_CLK routing — resolved (2026-07-18)
 
 While wiring the TMDS data lines, a real architectural gap surfaced that
 none of this project's prior docs actually settled: **where does each
 input port's GTH reference clock come from — the incoming HDMI
 connector's own TMDS_CLK pair, or the carrier's Si5341A?**
+
+**Resolved**: Si5341A stays as each quad's reference clock (Task 35's
+wiring was correct), and TMDS_CLK is wired to the quad's "spare" 4th
+GTH lane — exactly like the 3 TMDS_DATA lines, no new circuitry.
+Confirmed via AMD's own documentation (PG380): the GTH CDR tracks
+incoming data up to **±1250 ppm** from the reference-derived rate at
+bit rates below 6.6Gb/s (our ~5.94Gbps TMDS rate qualifies) — so a
+single reference doesn't need to equal the exact incoming rate, it
+just needs to be coarse-tuned per format, which is exactly what the
+Si5341A's "0.001 ppb tuning resolution, reconfigurable over I2C/SPI"
+was already chosen for (see "Reference clock generation" below).
+Format detection/reference retuning becomes a firmware concern, not a
+hardware one. This was surfaced by:
 
 - The corrected GTH allocation table (above) gives each quad 3 lanes for
   TMDS_DATA0/1/2 and **1 spare, unused** — there's no 4th data lane
@@ -218,21 +231,21 @@ connector's own TMDS_CLK pair, or the carrier's Si5341A?**
   different signaling levels/DC bias, so this isn't a bare wire-through
   even if it's the right call.
 
-**Not resolved. Two live options, not yet chosen between:**
-1. Keep Si5341A driving all 4 quads' references (already wired); rely on
-   GTH RX CDR to track each source's actual clock. Simpler wiring
-   (already done), standard technique, but needs confirming the CPLL's
-   lock range and the RX CDR's tracking range actually cover the
-   "arbitrary rate" requirement this project is built around.
-2. Route each input port's TMDS_CLK pair to its quad's reference input
-   instead, with appropriate level conditioning — ties each reference
-   directly to its live source, arguably more literally "native," but
-   undoes part of Task 35's wiring for 3 of the 4 quads and adds a
-   conditioning stage not yet designed.
+**Decision: keep Si5341A driving all 4 quads' references** (Task 35's
+wiring stands, no rework needed); wire TMDS_CLK to the "spare" 4th GTH
+lane per quad instead of to the reference clock pins. Rejected the
+alternative (routing TMDS_CLK directly into MGTREFCLK) because it
+would need a signal-conditioning stage that doesn't exist yet
+(MGTREFCLK expects AC-coupled LVPECL/HCSL-style signaling — 250mV+
+swing, 100Ω differential, 0.8V common mode — which TMDS doesn't match
+natively) and would undo already-validated wiring for no clear benefit
+once the CDR tracking-range numbers confirmed the simpler option works.
 
-The clock pair's ESD diodes (2 per port, TPD1E04U04) are deliberately
-**not yet placed** pending this — placing them now would silently commit
-to option 1 without it having been a real decision.
+**Done**: TMDS_CLK (P/N) wired through its own TPD1E04U04 ESD diode
+pair to the 4th GTH lane's B2B pins in all 4 HDMI sheets — J1-51/53
+(IN1), J1-27/29 (IN2), J1-2/4 (OUT, TX since we drive out), J2-30/28
+(IN3) — identical pattern to the 3 TMDS_DATA lines, verified the same
+way (every affected pin checked individually against the ERC report).
 
 ## Control plane: keep it off the GTH budget
 

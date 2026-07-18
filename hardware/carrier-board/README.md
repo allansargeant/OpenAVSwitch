@@ -10,11 +10,11 @@ open-drain N-MOSFET pulldown (2N7002), in all 4 HDMI sheets; exact GTH
 B2B pin assignments resolved from the primary TE0807 TRM; Si5341A's 4
 needed reference clock outputs wired to the SOM connector; ESD
 protection switched to TI TPD1E04U04 (real, fully verified, unlike the
-still-blocked Semtech RClamp0574P) and the 6 TMDS data lines (D0/D1/D2)
+still-blocked Semtech RClamp0574P); all 4 TMDS lines (D0/D1/D2 + CLK)
 wired end-to-end from connector through ESD protection to the exact SOM
-connector B2B pins in all 4 HDMI sheets. TMDS_CLK deliberately not yet
-wired — a real, previously-unsettled architecture question about GTH
-reference clock sourcing surfaced while doing this wiring, see
+connector B2B pins in all 4 HDMI sheets — TMDS_CLK routes to each
+quad's spare 4th GTH lane rather than the reference clock pins, a
+question resolved via AMD's own CDR tracking-range spec, see
 carrier-board-spec.md.**
 Design content lives
 in [../../docs/carrier-board-spec.md](../../docs/carrier-board-spec.md) —
@@ -126,17 +126,17 @@ DigiKey and matched against KiCad's own footprint library — see above.
   not ready. This resolves the "HPD: double-duty or separate GPIO"
   open question from carrier-board-spec.md in favor of the separate-
   GPIO option, since both TXS0102 channels are now committed to DDC.
-  **The 6 TMDS data lines (D0/D1/D2, P+N) are now wired too**: each
-  goes from J1 through its own TPD1E04U04 ESD diode (shunt to `GND`)
-  to a global label matching the exact SOM connector B2B pin resolved
-  earlier (`IN1_TMDS_D0_P` etc — see som_connector.kicad_sch). **The
-  TMDS_CLK pair is deliberately NOT wired yet** — see
-  carrier-board-spec.md's "Open question: TMDS_CLK routing" section,
-  a real architecture question (does each input's GTH reference clock
-  come from Si5341A, already wired in Task 35, or from the connector's
-  own TMDS_CLK pair?) surfaced while doing this wiring, not previously
-  settled. J1's own power pins (PLUS5V, DDC_CEC_GND, SHELL) are also
-  still unwired.
+  **All 4 TMDS lines (D0/D1/D2 + CLK, P+N) are now wired**: each goes
+  from J1 through its own TPD1E04U04 ESD diode (shunt to `GND`) to a
+  global label matching the exact SOM connector B2B pin resolved from
+  the TE0807 TRM (`IN1_TMDS_D0_P`, `IN1_TMDS_CLK_P` etc — see
+  som_connector.kicad_sch). TMDS_CLK goes to each quad's "spare" 4th
+  GTH lane (same pattern as the data lines) rather than to the
+  reference clock pins — see carrier-board-spec.md's "TMDS_CLK
+  routing" section for why (Si5341A stays as the reference; AMD's own
+  CDR tracking-range spec, ±1250ppm below 6.6Gb/s, confirmed the
+  simpler wiring is sound). J1's own power pins (PLUS5V, DDC_CEC_GND,
+  SHELL) are still unwired.
 - `clocking.kicad_sch` — Si5341A placed and validated, single-unit
   symbol so it avoided the multi-unit quirk below entirely. 4 of its 10
   output pairs (OUT0-OUT3) are now wired via global labels
@@ -213,25 +213,26 @@ matters later.
 
 ## Next steps
 
-1. **Resolve the TMDS_CLK routing question** (see carrier-board-spec.md's
-   "Open question" section) — this is now the single biggest open item,
-   a real architecture decision rather than a missing part or datasheet.
-2. RClamp0574P is no longer needed (superseded by TPD1E04U04 for TMDS);
+1. RClamp0574P is no longer needed (superseded by TPD1E04U04 for TMDS);
    an ordinary DDC/HPD/CEC-grade ESD array (e.g. SM712-class) is still
-   unplaced but is low-priority/low-risk compared to 1.
-3. EDID circuitry (soft I2C slave over the now-wired DDC bus).
-4. Design `power.kicad_sch`'s VCCO regulators themselves (the sequencing
+   unplaced but is low-priority/low-risk.
+2. EDID circuitry (soft I2C slave over the now-wired DDC bus) — this is
+   firmware/RTL work, not a schematic task.
+3. Design `power.kicad_sch`'s VCCO regulators themselves (the sequencing
    circuit driving their EN pins is done — see above) once specific
    regulator parts are chosen — blocked on two undecided upstream items,
    not just a missing datasheet: the exact per-bank I/O voltage (needs
    the FPGA-side I/O standard decided) and the carrier's own input power
    source (voltage/connector, never specified anywhere in this project).
-5. Route the DDC 3V3-side nets (`HDMI_IN1_SCL_3V3` etc, currently
+4. Route the DDC 3V3-side nets (`HDMI_IN1_SCL_3V3` etc, currently
    single-pin nets by design — see the `isolated_pin_label` ERC warnings,
    expected and benign until this is done) on to the GTH-facing SOM
-   connector pins, once real pin assignments exist for them (unlike
-   TMDS, these are ordinary GPIO and weren't in TE0807's own GTH table).
-6. Confirm the GTH allocation at the Vivado pin-planner level once real
+   connector pins, once real GPIO pin assignments exist for them (unlike
+   TMDS, these are ordinary GPIO and weren't in the TE0807's MGT table —
+   the TRM points to a separate, fuller "Pin-out table" resource on
+   Trenz's own site that wasn't tracked down in this pass, not fabricated,
+   needs a dedicated look).
+5. Confirm the GTH allocation at the Vivado pin-planner level once real
    pin assignments start (sanity-check only at this point — the B2B pin
    numbers are already resolved from the primary TRM).
 6. Optional cosmetic cleanup: reposition J2-J4 or resize the paper so
