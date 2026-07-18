@@ -191,6 +191,49 @@ capture standpoint — a final Vivado pin-planner pass before ordering
 copper is still worthwhile as a sanity check (per the open items list
 below) but is no longer a blocker for wiring the carrier board.
 
+## Open question: TMDS_CLK routing (found while wiring, not yet resolved)
+
+While wiring the TMDS data lines, a real architectural gap surfaced that
+none of this project's prior docs actually settled: **where does each
+input port's GTH reference clock come from — the incoming HDMI
+connector's own TMDS_CLK pair, or the carrier's Si5341A?**
+
+- The corrected GTH allocation table (above) gives each quad 3 lanes for
+  TMDS_DATA0/1/2 and **1 spare, unused** — there's no 4th data lane
+  budgeted for TMDS_CLK. That implies TMDS_CLK was always meant to feed
+  a *reference clock* input, not a regular RX data lane.
+- But **Task 35 already wired the Si5341A's 4 output pairs to the one
+  carrier-reachable reference clock input per quad** (all 4 ports,
+  including the 3 inputs) — treating the reference as a fixed, locally-
+  generated clock, with the actual per-source pixel timing presumably
+  recovered via each GTH RX lane's own CDR (clock-data-recovery), a
+  legitimate and common technique for capturing arbitrary serial rates.
+  This is *plausible* but was never the documented, deliberate plan —
+  it's what I inferred when TMDS wiring surfaced the gap, not something
+  decided earlier.
+- The alternative — feeding each input port's own incoming TMDS_CLK
+  pair directly into that quad's MGTREFCLK pins — would need signal
+  conditioning: MGTREFCLK expects an AC-coupled LVPECL/HCSL-style signal
+  (250mV+ swing, 100Ω differential, 0.8V common mode), and TMDS uses
+  different signaling levels/DC bias, so this isn't a bare wire-through
+  even if it's the right call.
+
+**Not resolved. Two live options, not yet chosen between:**
+1. Keep Si5341A driving all 4 quads' references (already wired); rely on
+   GTH RX CDR to track each source's actual clock. Simpler wiring
+   (already done), standard technique, but needs confirming the CPLL's
+   lock range and the RX CDR's tracking range actually cover the
+   "arbitrary rate" requirement this project is built around.
+2. Route each input port's TMDS_CLK pair to its quad's reference input
+   instead, with appropriate level conditioning — ties each reference
+   directly to its live source, arguably more literally "native," but
+   undoes part of Task 35's wiring for 3 of the 4 quads and adds a
+   conditioning stage not yet designed.
+
+The clock pair's ESD diodes (2 per port, TPD1E04U04) are deliberately
+**not yet placed** pending this — placing them now would silently commit
+to option 1 without it having been a real decision.
+
 ## Control plane: keep it off the GTH budget
 
 With GTH this tight, the carrier should not spend any on PCIe or other
@@ -222,19 +265,28 @@ Ethernet PHY on RGMII from the PS, no PCIe on this board rev.
   open-drain/level-shifted GPIO.
 - **CEC**: optional, deferred — not required for basic capture/display
   and skipping it simplifies the first revision.
-- **ESD protection — new recommendation, part confirmed but pinout still
-  needed**: **Semtech RClamp0574P**, confirmed directly from Semtech's
-  own product page (not just search snippets) as explicitly rated for
-  "HDMI 1.4, HDMI 1.4b and HDMI 2.0," 4 high-speed lines per package,
-  5-pin SLP2010N5 (2.0x1.0x0.5mm). Protects 2 differential pairs each,
-  so 2 chips cover all 4 pairs (3 TMDS + clock) — supersedes ESD8040,
-  which was both inaccessible *and* only inferred (not stated) as
-  4K60-capable. **Exact pin-by-pin numbering still not obtained** — a
-  dedicated datasheet PDF didn't surface in this pass (only the product
-  page and a sibling part's LCSC listing, neither with a full pin table)
-  — not fabricated, needs sourcing directly from Semtech/a distributor
-  before schematic capture. DDC/HPD/CEC (slower, less critical): ordinary
-  array, e.g. SM712-class.
+- **ESD protection — switched to TI TPD1E04U04, real and fully verified**
+  (2026-07-18): Semtech RClamp0574P stayed blocked after 6+ attempts
+  across distributors/searches (one attempt even returned a wrong-part
+  PDF for RClamp0522P/24P, caught via title metadata before use — same
+  trap as the earlier ESD8040/ESD8351 mix-up). Switched to **TI
+  TPD1E04U04**, confirmed explicitly "for HDMI 2.0 and USB 3.0,"
+  "Supports High Speed Interfaces up to 6 Gbps" (our 4K60 8-bit TMDS
+  rate is ~5.94Gbps) — fetched TI's own datasheet PDF directly (SLVSDG4B),
+  verified its title before use. It's a **single-channel** device (1
+  diode per line, not 4 per package like RClamp0574P), so it needs 8
+  instances per HDMI port (3 TMDS data pairs + clock pair, P and N
+  each) instead of 2 — more parts, but each is a trivial 2-pin part
+  (Pin 1 = IO, Pin 2 = GND) with a complete, unambiguous datasheet
+  including the full mechanical/land-pattern drawing, versus a part
+  whose pinout genuinely couldn't be found. **Placed and wired for the
+  6 TMDS data lines (D0/D1/D2, P+N) in all 4 HDMI sheets** — see
+  `hardware/carrier-board/README.md`. The clock pair (TMDS_CLK P/N)
+  is *not yet placed* — see "Open question: TMDS_CLK routing" below,
+  it isn't just an ESD-part gap, it's a real architecture decision.
+  DDC/HPD/CEC (slower, less critical) don't need this-grade protection;
+  an ordinary array (e.g. SM712-class) remains a fine choice there,
+  still not placed.
 - **EDID**: recommend **FPGA-driven emulation** (a soft I2C slave under
   our own control) over a fixed pre-programmed EEPROM. A static EEPROM
   can't tell a source "yes, I support this specific custom timing" —

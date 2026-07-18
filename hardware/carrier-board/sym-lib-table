@@ -5,5 +5,6 @@
   (lib (name "Si5341A-B-GM")(type "KiCad")(uri "${KIPRJMOD}/libs/symbols/Si5341A-B-GM.kicad_sym")(options "")(descr "Si5341A clock generator, hand-transcribed from Silicon Labs datasheet Table 17"))
   (lib (name "HDMI_TypeA_Receptacle")(type "KiCad")(uri "${KIPRJMOD}/libs/symbols/HDMI_TypeA_Receptacle.kicad_sym")(options "")(descr "Generic HDMI Type-A pinout per public spec -- no footprint/manufacturer part chosen yet"))
   (lib (name "2N7002")(type "KiCad")(uri "${KIPRJMOD}/libs/symbols/2N7002.kicad_sym")(options "")(descr "Generic N-MOSFET body copied from KiCad's own Device:Q_NMOS, pin numbers remapped to the real SOT-23 pinout (1=G/2=S/3=D, cross-checked against 4 manufacturer datasheets) -- used as an open-drain HPD pulldown"))
+  (lib (name "TPD1E04U04")(type "KiCad")(uri "${KIPRJMOD}/libs/symbols/TPD1E04U04.kicad_sym")(options "")(descr "TI single-channel HDMI 2.0-rated ESD diode (1=IO, 2=GND), hand-authored from TI's own datasheet SLVSDG4B -- chosen over the still-blocked Semtech RClamp0574P; one instance per single-ended TMDS line"))
   (lib (name "Device")(type "KiCad")(uri "${KICAD10_SYMBOL_DIR}/Device.kicad_sym")(options "")(descr "KiCad standard library (R, C, etc.) -- portable variable, matches KiCad's own template; embedded copies in each sheet are self-contained regardless"))
 )

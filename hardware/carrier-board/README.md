@@ -7,10 +7,15 @@ pins (VCCA/VCCB/GND) wired to +3V3/GND, the DDC (SCL/SDA) signal path
 from the HDMI connector through the level translator to a
 per-sheet-unique 3V3-side net wired, and HPD wired through a dedicated
 open-drain N-MOSFET pulldown (2N7002), in all 4 HDMI sheets; exact GTH
-B2B pin assignments resolved from the primary TE0807 TRM and the
-Si5341A's 4 needed reference clock outputs wired to the SOM connector;
-ESD protection switched to a correctly-rated real part (Semtech
-RClamp0574P) though its exact pin table is still unsourced.**
+B2B pin assignments resolved from the primary TE0807 TRM; Si5341A's 4
+needed reference clock outputs wired to the SOM connector; ESD
+protection switched to TI TPD1E04U04 (real, fully verified, unlike the
+still-blocked Semtech RClamp0574P) and the 6 TMDS data lines (D0/D1/D2)
+wired end-to-end from connector through ESD protection to the exact SOM
+connector B2B pins in all 4 HDMI sheets. TMDS_CLK deliberately not yet
+wired — a real, previously-unsettled architecture question about GTH
+reference clock sourcing surfaced while doing this wiring, see
+carrier-board-spec.md.**
 Design content lives
 in [../../docs/carrier-board-spec.md](../../docs/carrier-board-spec.md) —
 read that first.
@@ -35,6 +40,17 @@ hand-transcribed from primary datasheets, none placeholders:
   matched to KiCad's own standard `QFN-64-1EP_9x9mm_P0.5mm_EP5.2x5.2mm`
   (verified against the datasheet's Table 18 dimensions, copied in from
   the local KiCad install's official library).
+- `libs/symbols/TPD1E04U04.kicad_sym` — TI single-channel HDMI 2.0-rated
+  ESD diode, hand-authored directly from TI's own datasheet (SLVSDG4B):
+  2 pins (1=IO, 2=GND), package X1SON/DPY (JEDEC DPY0002A). Chosen over
+  the still-blocked Semtech RClamp0574P — see carrier-board-spec.md's
+  ESD protection section for the full story (RClamp0574P's 6th+ failed
+  attempt turned up a wrong-part PDF, caught via title metadata). One
+  instance needed per single-ended line (8 per HDMI port), not 4 lines
+  per package like RClamp0574P — more parts, but every one of them is
+  trivial and the datasheet (including the mechanical/land-pattern
+  drawing) was actually obtainable. Footprint hand-built from the same
+  datasheet's land pattern.
 - `libs/symbols/2N7002.kicad_sym` — generic N-MOSFET body copied from
   KiCad's own `Device:Q_NMOS`, pin **numbers** remapped from the
   generic symbol's letter placeholders (D/G/S) to the real SOT-23
@@ -110,8 +126,17 @@ DigiKey and matched against KiCad's own footprint library — see above.
   not ready. This resolves the "HPD: double-duty or separate GPIO"
   open question from carrier-board-spec.md in favor of the separate-
   GPIO option, since both TXS0102 channels are now committed to DDC.
-  J1's own power pins (PLUS5V, DDC_CEC_GND, SHELL) and all TMDS signal
-  nets are still unwired — next step.
+  **The 6 TMDS data lines (D0/D1/D2, P+N) are now wired too**: each
+  goes from J1 through its own TPD1E04U04 ESD diode (shunt to `GND`)
+  to a global label matching the exact SOM connector B2B pin resolved
+  earlier (`IN1_TMDS_D0_P` etc — see som_connector.kicad_sch). **The
+  TMDS_CLK pair is deliberately NOT wired yet** — see
+  carrier-board-spec.md's "Open question: TMDS_CLK routing" section,
+  a real architecture question (does each input's GTH reference clock
+  come from Si5341A, already wired in Task 35, or from the connector's
+  own TMDS_CLK pair?) surfaced while doing this wiring, not previously
+  settled. J1's own power pins (PLUS5V, DDC_CEC_GND, SHELL) are also
+  still unwired.
 - `clocking.kicad_sch` — Si5341A placed and validated, single-unit
   symbol so it avoided the multi-unit quirk below entirely. 4 of its 10
   output pairs (OUT0-OUT3) are now wired via global labels
@@ -188,25 +213,27 @@ matters later.
 
 ## Next steps
 
-1. Source RClamp0574P's actual pin table (part confirmed real and
-   correctly rated, just the datasheet itself — the only genuinely
-   blocked item left).
-2. Wire the TMDS signal nets (exact B2B pins per port now known — see
-   carrier-board-spec.md's B2B pin table — but the physical path is
-   connector → ESD protection → SOM connector, so this still wants 1
-   resolved first, or an explicit documented gap if wired ahead of it),
-   add ESD protection once 1 is resolved, and EDID circuitry (HPD and
-   the reference clocks are now wired — see above).
-3. Design `power.kicad_sch`'s VCCO regulators themselves (the sequencing
+1. **Resolve the TMDS_CLK routing question** (see carrier-board-spec.md's
+   "Open question" section) — this is now the single biggest open item,
+   a real architecture decision rather than a missing part or datasheet.
+2. RClamp0574P is no longer needed (superseded by TPD1E04U04 for TMDS);
+   an ordinary DDC/HPD/CEC-grade ESD array (e.g. SM712-class) is still
+   unplaced but is low-priority/low-risk compared to 1.
+3. EDID circuitry (soft I2C slave over the now-wired DDC bus).
+4. Design `power.kicad_sch`'s VCCO regulators themselves (the sequencing
    circuit driving their EN pins is done — see above) once specific
-   regulator parts are chosen.
-4. Route the DDC 3V3-side nets (`HDMI_IN1_SCL_3V3` etc, currently
+   regulator parts are chosen — blocked on two undecided upstream items,
+   not just a missing datasheet: the exact per-bank I/O voltage (needs
+   the FPGA-side I/O standard decided) and the carrier's own input power
+   source (voltage/connector, never specified anywhere in this project).
+5. Route the DDC 3V3-side nets (`HDMI_IN1_SCL_3V3` etc, currently
    single-pin nets by design — see the `isolated_pin_label` ERC warnings,
-   expected and benign until this is done) and the TMDS/clock pairs from
-   J1/clocking, on to the GTH-facing SOM connector pins, once real pin
-   assignments exist.
-5. Confirm the GTH allocation at the Vivado pin-planner level once real
-   pin assignments start.
+   expected and benign until this is done) on to the GTH-facing SOM
+   connector pins, once real pin assignments exist for them (unlike
+   TMDS, these are ordinary GPIO and weren't in TE0807's own GTH table).
+6. Confirm the GTH allocation at the Vivado pin-planner level once real
+   pin assignments start (sanity-check only at this point — the B2B pin
+   numbers are already resolved from the primary TRM).
 6. Optional cosmetic cleanup: reposition J2-J4 or resize the paper so
    som_connector.kicad_sch fits visually on one printable page; offset
    the overlapping label pairs in power.kicad_sch for readability.

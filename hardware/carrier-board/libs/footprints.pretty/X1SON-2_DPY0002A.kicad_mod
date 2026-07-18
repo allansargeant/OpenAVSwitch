@@ -1,0 +1,101 @@
+(footprint "X1SON-2_DPY0002A"
+	(version 20260206)
+	(generator "pcbnew")
+	(generator_version "10.0")
+	(layer "F.Cu")
+	(descr "TI X1SON-2 (DPY), JEDEC DPY0002A, body 1.1x0.7mm max / 0.9x0.5mm min, 0.45mm max height. Land pattern from TI TPD1E04U04 datasheet (SLVSDG4B) 'Example Board Layout': 2 pads, each 0.55x0.3mm, 0.65mm pad-center pitch. https://www.ti.com/lit/ds/symlink/tpd1e04u04.pdf")
+	(property "Reference" "REF**"
+		(at 0 -1.1 0)
+		(layer "F.SilkS")
+		(hide yes)
+		(uuid "8f1a1a1a-0001-0001-0001-000000000001")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Value" "X1SON-2_DPY0002A"
+		(at 0 1.1 0)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "8f1a1a1a-0001-0001-0001-000000000002")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 0 0 0)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "1e19702a-690e-45ca-b39b-8b2e8d74ee51")
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Description" ""
+		(at 0 0 0)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "03124b9a-5ec6-4610-be83-375da57163ce")
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(attr smd)
+	(duplicate_pad_numbers_are_jumpers no)
+	(fp_line
+		(start -0.55 -0.35)
+		(end -0.15 -0.35)
+		(stroke
+			(width 0.12)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "8f1a1a1a-0001-0001-0001-000000000004")
+	)
+	(fp_line
+		(start -0.55 0.35)
+		(end -0.15 0.35)
+		(stroke
+			(width 0.12)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "8f1a1a1a-0001-0001-0001-000000000005")
+	)
+	(fp_rect
+		(start -0.55 -0.35)
+		(end 0.55 0.35)
+		(stroke
+			(width 0.05)
+			(type solid)
+		)
+		(fill no)
+		(layer "F.Fab")
+		(uuid "8f1a1a1a-0001-0001-0001-000000000003")
+	)
+	(pad "1" smd roundrect
+		(at -0.325 0)
+		(size 0.55 0.3)
+		(layers "F.Cu" "F.Mask" "F.Paste")
+		(roundrect_rratio 0.25)
+		(uuid "8f1a1a1a-0001-0001-0001-000000000006")
+	)
+	(pad "2" smd roundrect
+		(at 0.325 0)
+		(size 0.55 0.3)
+		(layers "F.Cu" "F.Mask" "F.Paste")
+		(roundrect_rratio 0.25)
+		(uuid "8f1a1a1a-0001-0001-0001-000000000007")
+	)
+	(embedded_fonts no)
+)

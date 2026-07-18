@@ -751,6 +751,146 @@
 			)
 			(embedded_fonts no)
 		)
+		(symbol "TPD1E04U04:TPD1E04U04"
+			(pin_names
+				(offset 0.762)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(in_pos_files yes)
+			(duplicate_pin_numbers_are_jumpers no)
+			(property "Reference" "D"
+				(at -2.54 3.302 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Value" "TPD1E04U04"
+				(at -2.54 -3.302 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" "carrier_footprints:X1SON-2_DPY0002A"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Datasheet" "https://www.ti.com/lit/ds/symlink/tpd1e04u04.pdf"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Description" "1-channel unidirectional TVS ESD protection diode, HDMI 2.0/USB 3.0 rated (supports up to 6Gbps -- comfortably covers our 4K60 ~5.94Gbps TMDS rate), 0.5pF typ IO capacitance. Pinout (1=IO, 2=GND) and package (X1SON/DPY, JEDEC DPY0002A, 1x0.6mm body) confirmed directly from TI's own datasheet (SLVSDG4B), not a search summary -- fetched as a real PDF, title metadata verified before use (an earlier attempt at a different ESD part, RClamp0574P, turned up a wrong-part PDF caught the same way). Chosen over the still-blocked Semtech RClamp0574P (6+ failed attempts to obtain its pin table) because it is genuinely simple (2 pins) and its datasheet, including the full mechanical/land-pattern drawing, was directly accessible. One instance needed per single-ended line (8 per HDMI port: 3 TMDS data pairs + clock pair, P and N each) -- shunt-connected (IO taps the signal path, GND to ground), not inline."
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(symbol "TPD1E04U04_0_1"
+				(polyline
+					(pts
+						(xy -1.27 1.27) (xy -1.27 -1.27) (xy 1.27 0) (xy -1.27 1.27)
+					)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type outline)
+					)
+				)
+				(polyline
+					(pts
+						(xy -1.27 0) (xy 1.27 0)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 1.27 1.27) (xy 1.27 -1.27)
+					)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+			)
+			(symbol "TPD1E04U04_1_1"
+				(pin passive line
+					(at -3.81 0 0)
+					(length 2.54)
+					(name "IO"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin power_in line
+					(at 3.81 0 180)
+					(length 2.54)
+					(name "GND"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
 		(symbol "TXS0102DCUR:TXS0102DCUR"
 			(pin_names
 				(offset 1.016)
@@ -1073,6 +1213,36 @@
 	)
 	(wire
 		(pts
+			(xy 26.67 107.95) (xy 26.67 220.98)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "0dcca5b5-3467-4e3b-af86-165e07c71894")
+	)
+	(wire
+		(pts
+			(xy 25.4 118.11) (xy 7.62 118.11)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "192bbe72-5c91-4cc9-ac87-27c7c8a09ead")
+	)
+	(wire
+		(pts
+			(xy 20.32 110.49) (xy 20.32 220.98)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "2768a2ee-74a8-4e28-bb31-95a6d2c1a66d")
+	)
+	(wire
+		(pts
 			(xy 25.4 154.94) (xy 27.94 154.94)
 		)
 		(stroke
@@ -1113,6 +1283,56 @@
 	)
 	(wire
 		(pts
+			(xy 25.4 110.49) (xy 20.32 110.49)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "4ccd2b35-0a67-497d-ac76-605b9ff03932")
+	)
+	(wire
+		(pts
+			(xy 25.4 123.19) (xy 1.27 123.19)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "6712469c-8b00-4eed-992f-740a58630ade")
+	)
+	(wire
+		(pts
+			(xy 7.62 118.11) (xy 7.62 220.98)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "877818ce-871d-4ae2-afe0-093493c888ab")
+	)
+	(wire
+		(pts
+			(xy 13.97 115.57) (xy 13.97 220.98)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "9cf061dc-fded-4db7-a74f-6a69887b8a3f")
+	)
+	(wire
+		(pts
+			(xy 33.02 102.87) (xy 33.02 220.98)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "9ee6dc09-34ab-4c35-b150-09736004bf6d")
+	)
+	(wire
+		(pts
 			(xy 81.28 85.09) (xy 81.28 99.06)
 		)
 		(stroke
@@ -1120,6 +1340,138 @@
 			(type default)
 		)
 		(uuid "9ffd8d34-54c2-4d11-96c3-3dfe71cc7f6a")
+	)
+	(wire
+		(pts
+			(xy 1.27 123.19) (xy 1.27 220.98)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "a6d6cfc2-5209-4f08-9374-48559164120e")
+	)
+	(wire
+		(pts
+			(xy 25.4 115.57) (xy 13.97 115.57)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "b888dfc2-3494-4687-a1d8-b4a45d693bfe")
+	)
+	(wire
+		(pts
+			(xy 25.4 107.95) (xy 26.67 107.95)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "c03f1572-9fec-4c26-aebb-5064fca9ba9b")
+	)
+	(wire
+		(pts
+			(xy 25.4 102.87) (xy 33.02 102.87)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "c3dba5ab-d2ac-41ae-af98-b1f0b7a30ca9")
+	)
+	(global_label "GND"
+		(shape input)
+		(at 27.94 220.98 0)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "26f1b714-dfe8-47aa-8c31-f73b49128360")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 27.94 220.98 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+	)
+	(global_label "OUT_TMDS_D2_P"
+		(shape input)
+		(at 1.27 220.98 0)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "370e2245-cd91-4b1b-b421-7eb09ac739a7")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 1.27 220.98 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+	)
+	(global_label "OUT_TMDS_D1_P"
+		(shape input)
+		(at 13.97 220.98 0)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "393680c7-cdae-443d-ab7f-394bc2eefa30")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 13.97 220.98 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+	)
+	(global_label "OUT_TMDS_D0_N"
+		(shape input)
+		(at 33.02 220.98 0)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "54df58db-875d-4dfb-95ba-e1acbd864ead")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 33.02 220.98 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
 	)
 	(global_label "GND"
 		(shape input)
@@ -1144,6 +1496,29 @@
 			)
 		)
 	)
+	(global_label "OUT_TMDS_D2_N"
+		(shape input)
+		(at 7.62 220.98 0)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "792972d2-873e-49e9-8a5c-3ea83a6fc385")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 7.62 220.98 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+	)
 	(global_label "+3V3"
 		(shape input)
 		(at 116.84 83.82 0)
@@ -1157,6 +1532,98 @@
 		(uuid "79e3cd6d-ef50-463c-a96a-068dd50de042")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
 			(at 116.84 83.82 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+	)
+	(global_label "GND"
+		(shape input)
+		(at 15.24 220.98 0)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "7e912f98-d9d9-4cd8-b676-a2f3d1114cbf")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 15.24 220.98 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+	)
+	(global_label "GND"
+		(shape input)
+		(at 34.29 220.98 0)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "814d565a-704e-40f6-95c1-fdcb66c3ae75")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 34.29 220.98 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+	)
+	(global_label "GND"
+		(shape input)
+		(at 40.64 220.98 0)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "893f0c6b-d044-40c8-8edb-8f1cec52ce5d")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 40.64 220.98 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+	)
+	(global_label "OUT_TMDS_D0_P"
+		(shape input)
+		(at 26.67 220.98 0)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "8e60866a-4bd9-41a5-acab-c0654cbe2aec")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 26.67 220.98 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -1215,6 +1682,29 @@
 	)
 	(global_label "GND"
 		(shape input)
+		(at 8.89 220.98 0)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "9c2dca84-8c4b-43a6-9593-b1c7e6d731c8")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 8.89 220.98 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+	)
+	(global_label "GND"
+		(shape input)
 		(at 27.94 165.1 0)
 		(fields_autoplaced yes)
 		(effects
@@ -1226,6 +1716,29 @@
 		(uuid "9d6de78d-39b0-4a2d-8bfd-ff52f58c9e4c")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
 			(at 27.94 165.1 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+	)
+	(global_label "GND"
+		(shape input)
+		(at 21.59 220.98 0)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "a066890e-8004-4365-90c5-67708ac9304b")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 21.59 220.98 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -1280,6 +1793,167 @@
 					(size 1.27 1.27)
 				)
 			)
+		)
+	)
+	(global_label "OUT_TMDS_D1_N"
+		(shape input)
+		(at 20.32 220.98 0)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "e5add80f-8718-4154-9ab6-6c9b17f0e50a")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 20.32 220.98 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "TPD1E04U04:TPD1E04U04")
+		(at 17.78 220.98 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "1590c4d8-6d2b-4f75-ab8e-0f79d72c9839")
+		(property "Reference" "D3"
+			(at 17.78 218.44 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "TPD1E04U04"
+			(at 17.78 223.52 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "carrier_footprints:X1SON-2_DPY0002A"
+			(at 17.78 220.98 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" "https://www.ti.com/lit/ds/symlink/tpd1e04u04.pdf"
+			(at 17.78 220.98 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 17.78 220.98 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "143128bc-ba7a-418a-9b1b-270f237cea40")
+		)
+		(pin "2"
+			(uuid "8518fce0-5c29-400c-ab54-840d1d00bf7d")
+		)
+	)
+	(symbol
+		(lib_id "TPD1E04U04:TPD1E04U04")
+		(at 30.48 220.98 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "27796404-d3f0-4237-a246-98e27dc2247d")
+		(property "Reference" "D5"
+			(at 30.48 218.44 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "TPD1E04U04"
+			(at 30.48 223.52 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "carrier_footprints:X1SON-2_DPY0002A"
+			(at 30.48 220.98 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" "https://www.ti.com/lit/ds/symlink/tpd1e04u04.pdf"
+			(at 30.48 220.98 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 30.48 220.98 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "ade99889-99c5-4875-ba46-4f414d6d9395")
+		)
+		(pin "2"
+			(uuid "3b35a6fc-ae9c-4135-bdcc-b6edeecc7753")
 		)
 	)
 	(symbol
@@ -1367,6 +2041,75 @@
 		)
 		(pin "8"
 			(uuid "a3d26dac-12c4-4c52-aaec-45a864f16304")
+		)
+	)
+	(symbol
+		(lib_id "TPD1E04U04:TPD1E04U04")
+		(at 36.83 220.98 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "863707f7-0f17-45ba-8450-43533f230e42")
+		(property "Reference" "D6"
+			(at 36.83 218.44 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "TPD1E04U04"
+			(at 36.83 223.52 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "carrier_footprints:X1SON-2_DPY0002A"
+			(at 36.83 220.98 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" "https://www.ti.com/lit/ds/symlink/tpd1e04u04.pdf"
+			(at 36.83 220.98 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 36.83 220.98 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "ab8603fe-5401-43ac-9345-0147ec13cd42")
+		)
+		(pin "2"
+			(uuid "e8b475c1-ce50-4fd9-99df-da70e1f3e1d3")
 		)
 	)
 	(symbol
@@ -1493,6 +2236,75 @@
 		)
 	)
 	(symbol
+		(lib_id "TPD1E04U04:TPD1E04U04")
+		(at 11.43 220.98 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "aa7b24ad-8a5a-44ae-aa7d-51e5dc7f8aa3")
+		(property "Reference" "D2"
+			(at 11.43 218.44 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "TPD1E04U04"
+			(at 11.43 223.52 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "carrier_footprints:X1SON-2_DPY0002A"
+			(at 11.43 220.98 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" "https://www.ti.com/lit/ds/symlink/tpd1e04u04.pdf"
+			(at 11.43 220.98 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 11.43 220.98 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "e871edbc-50ac-4320-a66b-616b067be9f0")
+		)
+		(pin "2"
+			(uuid "cfae7f50-ab10-422e-8194-fa07ed12313d")
+		)
+	)
+	(symbol
 		(lib_id "2N7002:2N7002")
 		(at 25.4 160.02 0)
 		(unit 1)
@@ -1564,6 +2376,144 @@
 		)
 		(pin "3"
 			(uuid "d834930a-a07a-4969-a056-e36a263c1efe")
+		)
+	)
+	(symbol
+		(lib_id "TPD1E04U04:TPD1E04U04")
+		(at 5.08 220.98 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "b94b521a-1db8-4d40-8991-0d85e8de7cd1")
+		(property "Reference" "D1"
+			(at 5.08 218.44 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "TPD1E04U04"
+			(at 5.08 223.52 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "carrier_footprints:X1SON-2_DPY0002A"
+			(at 5.08 220.98 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" "https://www.ti.com/lit/ds/symlink/tpd1e04u04.pdf"
+			(at 5.08 220.98 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 5.08 220.98 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "f6a76f56-b15f-4636-b7ad-6ed1b6d5b808")
+		)
+		(pin "2"
+			(uuid "53534265-caa6-4540-90c3-8ee215e46a52")
+		)
+	)
+	(symbol
+		(lib_id "TPD1E04U04:TPD1E04U04")
+		(at 24.13 220.98 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "eb46e5c2-6a36-4f23-97f1-03a38733d379")
+		(property "Reference" "D4"
+			(at 24.13 218.44 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "TPD1E04U04"
+			(at 24.13 223.52 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "carrier_footprints:X1SON-2_DPY0002A"
+			(at 24.13 220.98 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" "https://www.ti.com/lit/ds/symlink/tpd1e04u04.pdf"
+			(at 24.13 220.98 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 24.13 220.98 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "c9de7363-f3fe-489b-bd80-0609b65b1d85")
+		)
+		(pin "2"
+			(uuid "b97b0b29-2945-4278-bf94-2361eda49336")
 		)
 	)
 	(sheet_instances
