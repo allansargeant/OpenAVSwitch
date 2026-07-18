@@ -3,9 +3,10 @@
 Status: **all 4 SOM connectors + level translators + clock generator +
 power sequencing circuit placed and validated; real HDMI connector part
 resolved and placed in all 4 HDMI sheets; TXS0102 level-translator power
-pins (VCCA/VCCB/GND) wired to +3V3/GND, and the DDC (SCL/SDA) signal
-path from the HDMI connector through the level translator to a
-per-sheet-unique 3V3-side net wired, in all 4 HDMI sheets; ESD
+pins (VCCA/VCCB/GND) wired to +3V3/GND, the DDC (SCL/SDA) signal path
+from the HDMI connector through the level translator to a
+per-sheet-unique 3V3-side net wired, and HPD wired through a dedicated
+open-drain N-MOSFET pulldown (2N7002), in all 4 HDMI sheets; ESD
 protection switched to a correctly-rated real part (Semtech RClamp0574P)
 though its exact pin table is still unsourced.**
 Design content lives
@@ -32,6 +33,14 @@ hand-transcribed from primary datasheets, none placeholders:
   matched to KiCad's own standard `QFN-64-1EP_9x9mm_P0.5mm_EP5.2x5.2mm`
   (verified against the datasheet's Table 18 dimensions, copied in from
   the local KiCad install's official library).
+- `libs/symbols/2N7002.kicad_sym` — generic N-MOSFET body copied from
+  KiCad's own `Device:Q_NMOS`, pin **numbers** remapped from the
+  generic symbol's letter placeholders (D/G/S) to the real SOT-23
+  physical pinout (1=G, 2=S, 3=D), cross-checked against 4 independent
+  manufacturer datasheets (Nexperia, Microchip, ON Semi, ST) via live
+  web search, all in agreement. Footprint: KiCad's own bundled
+  `Package_TO_SOT_SMD.pretty/SOT-23.kicad_mod`, copied in unmodified.
+  Used as the HPD open-drain pulldown (see below).
 - `libs/symbols/HDMI_TypeA_Receptacle.kicad_sym` — pinout hand-built from
   the public HDMI specification (manufacturer-independent, high
   confidence), **footprint now resolved**: Amphenol ICC (FCI)
@@ -90,10 +99,17 @@ DigiKey and matched against KiCad's own footprint library — see above.
   `HDMI_IN2_...`, etc — deliberately **not** the same net name across
   sheets, since each HDMI port's DDC bus must stay electrically
   independent) ready to extend to the SOM connector's I2C GPIO pins
-  once those are pin-planned. J1's own power pins (PLUS5V,
-  DDC_CEC_GND, SHELL), HPD (pin 19, still an open design decision —
-  see carrier-board-spec.md), and all TMDS signal nets are still
-  unwired — next step.
+  once those are pin-planned. **HPD is now wired too**: J1 pin 19
+  (HPD) connects via a real wire to Q1 (2N7002 N-MOSFET) acting as an
+  open-drain pulldown — Drain to HPD, Source to `GND`, Gate to a
+  per-sheet-unique global label (`HDMI_IN1_HPD_CTL_3V3` etc). No
+  pull-up is placed on our side by design: the HDMI *source* provides
+  the 5V HPD pull-up per spec, so the sink only needs to pull low when
+  not ready. This resolves the "HPD: double-duty or separate GPIO"
+  open question from carrier-board-spec.md in favor of the separate-
+  GPIO option, since both TXS0102 channels are now committed to DDC.
+  J1's own power pins (PLUS5V, DDC_CEC_GND, SHELL) and all TMDS signal
+  nets are still unwired — next step.
 - `clocking.kicad_sch` — Si5341A placed and validated, single-unit
   symbol so it avoided the multi-unit quirk below entirely.
 - `som_connector.kicad_sch` — **J1, J2, J3, J4** all placed (Samtec
@@ -129,6 +145,24 @@ verified via ERC and by checking the reported violation coordinates
 match the real pin location for every power pin, not just for the
 name that happens to be missing.
 
+**Insertion-marker gotcha, hit while placing Q1 (2N7002)**: a script
+that inserts a new `lib_symbols` entry by searching for a fixed text
+marker (e.g. "right after the TXS0102DCUR lib entry closes") is only
+safe as long as nothing else changes what follows that marker. Once
+the HDMI connector and DDC/power wiring tasks changed each sheet's
+component-instance ordering, the *same* marker text coincidentally
+matched the boundary between two placed *instances* (J1 then U1)
+instead of the `lib_symbols` block's own closing paren — inserting a
+whole symbol definition into the placed-components section, which
+KiCad correctly refused to load ("Failed to load schematic"). Fixed
+by finding `lib_symbols`'s closing paren via brace-depth parsing from
+its own opening keyword, not by pattern-matching neighboring content.
+Prefer this for any future `lib_symbols` insertion. Also hit a plain
+grid-alignment slip in the same pass (chose `Q1`'s Y placement as a
+round number, 160.0, which isn't a multiple of the 1.27mm grid) —
+caught by the `endpoint_off_grid` ERC violation, fixed by snapping to
+the nearest 1.27 multiple (160.02).
+
 **Known `kicad-cli sch erc` engine quirk, not a wiring defect**: after
 the power-pin fix, the ERC report still flags `HDMI Input 1`'s U1
 VCCA and GND pins as `power_pin_not_driven`, while byte-for-byte
@@ -149,11 +183,8 @@ matters later.
 1. Source RClamp0574P's actual pin table (part confirmed real and
    correctly rated, just the datasheet itself — the only genuinely
    blocked item left).
-2. Decide and wire HPD (open design decision — double-duty on a level
-   translator isn't available anymore since both TXS0102 channels are
-   now used for DDC, so it needs its own simple open-drain/level-shifted
-   GPIO circuit per carrier-board-spec.md), wire the TMDS signal nets,
-   add ESD protection once 1 is resolved, and EDID circuitry.
+2. Wire the TMDS signal nets, add ESD protection once 1 is resolved,
+   and EDID circuitry (HPD is now wired — see above).
 3. Design `power.kicad_sch`'s VCCO regulators themselves (the sequencing
    circuit driving their EN pins is done — see above) once specific
    regulator parts are chosen.
