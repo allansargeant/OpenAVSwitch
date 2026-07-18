@@ -145,6 +145,52 @@ were rejected: the first reintroduces exactly the limitation the
 native-capture requirement exists to avoid, and the second is unresearched
 and likely costs more / loses the hard Arm PS.
 
+## Exact B2B pin assignments (confirmed from the primary TRM, Tables 5 & 6)
+
+The GTH allocation above was quad-level only ("3 lanes on quad 224" etc)
+— this resolves it to **actual physical B2B connector pin numbers**,
+fetched directly from the TE0807 TRM's raw HTML (Confluence page) and
+parsed straight out of its `<table>` markup, not summarized by an
+intermediate tool — a first WebFetch pass paraphrasing the same tables
+gave an internally inconsistent example (attributed bank 224's
+reference clock to both J1 and J3 across two calls), so the numbers
+below come from the literal table cells, cross-checked row by row.
+
+**TMDS data (lanes 0-2 of each quad; lane 3 always spare/unused)** — for
+the 3 input ports the carrier *drives* the module's RX pins; for the
+one output port the module drives TX and the carrier *receives*:
+
+| Port | Quad | B2B connector | D0 (P/N) | D1 (P/N) | D2 (P/N) |
+|---|---|---|---|---|---|
+| HDMI IN 1 | 224 | J1 (RX) | J1-69 / J1-71 | J1-63 / J1-65 | J1-57 / J1-59 |
+| HDMI IN 2 | 225 | J1 (RX) | J1-45 / J1-47 | J1-39 / J1-41 | J1-33 / J1-35 |
+| HDMI OUT  | 226 | J1 (TX) | J1-20 / J1-22 | J1-14 / J1-16 | J1-8 / J1-10 |
+| HDMI IN 3 | 227 | J2 (RX) | J2-48 / J2-46 | J2-42 / J2-40 | J2-36 / J2-34 |
+
+**Reference clocks**: each GTH quad has *two* possible reference clock
+inputs (CLK0 and CLK1) — for every quad we use, **exactly one of the
+two is wired to a B2B connector pin** (carrier-suppliable) and **the
+other is hardwired to the module's own on-board Si5345A** (not
+carrier-accessible). This matters: our Si5341A must drive whichever
+one is the B2B-connected option for each quad, not just "a" reference
+input:
+
+| Port | Quad | Usable ref clock | B2B pin (P/N) |
+|---|---|---|---|
+| HDMI IN 1 | 224 | CLK0 | J3-62 / J3-60 |
+| HDMI IN 2 | 225 | CLK0 | J3-67 / J3-65 |
+| HDMI OUT  | 226 | CLK1 | J3-61 / J3-59 |
+| HDMI IN 3 | 227 | CLK1 | J2-22 / J2-24 |
+
+(Quad 224/225's CLK1 and quad 226/227's CLK0 are all fixed to the
+module's Si5345A and cannot be driven by the carrier — confirmed
+explicitly in Table 6, not assumed.)
+
+This resolves the "confirm GTH allocation" open item from a schematic-
+capture standpoint — a final Vivado pin-planner pass before ordering
+copper is still worthwhile as a sanity check (per the open items list
+below) but is no longer a blocker for wiring the carrier board.
+
 ## Control plane: keep it off the GTH budget
 
 With GTH this tight, the carrier should not spend any on PCIe or other
