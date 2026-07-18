@@ -6,9 +6,11 @@ resolved and placed in all 4 HDMI sheets; TXS0102 level-translator power
 pins (VCCA/VCCB/GND) wired to +3V3/GND, the DDC (SCL/SDA) signal path
 from the HDMI connector through the level translator to a
 per-sheet-unique 3V3-side net wired, and HPD wired through a dedicated
-open-drain N-MOSFET pulldown (2N7002), in all 4 HDMI sheets; ESD
-protection switched to a correctly-rated real part (Semtech RClamp0574P)
-though its exact pin table is still unsourced.**
+open-drain N-MOSFET pulldown (2N7002), in all 4 HDMI sheets; exact GTH
+B2B pin assignments resolved from the primary TE0807 TRM and the
+Si5341A's 4 needed reference clock outputs wired to the SOM connector;
+ESD protection switched to a correctly-rated real part (Semtech
+RClamp0574P) though its exact pin table is still unsourced.**
 Design content lives
 in [../../docs/carrier-board-spec.md](../../docs/carrier-board-spec.md) —
 read that first.
@@ -111,7 +113,13 @@ DigiKey and matched against KiCad's own footprint library — see above.
   J1's own power pins (PLUS5V, DDC_CEC_GND, SHELL) and all TMDS signal
   nets are still unwired — next step.
 - `clocking.kicad_sch` — Si5341A placed and validated, single-unit
-  symbol so it avoided the multi-unit quirk below entirely.
+  symbol so it avoided the multi-unit quirk below entirely. 4 of its 10
+  output pairs (OUT0-OUT3) are now wired via global labels
+  (`REFCLK_IN1_P/N` etc) straight to the exact B2B connector pins each
+  GTH quad's carrier-reachable reference clock input lands on (per the
+  TE0807 TRM Table 6 pin table in carrier-board-spec.md) — `J3` pins
+  62/60 (IN1), 67/65 (IN2), 61/59 (OUT), and `J2` pins 22/24 (IN3).
+  6 outputs remain spare.
 - `som_connector.kicad_sch` — **J1, J2, J3, J4** all placed (Samtec
   SS5-80-3.50-L-D-K-TR x4, 160 pins each, correctly split 80/80 across
   each connector's 2 units). Verified clean via `sch erc` (see note
@@ -183,8 +191,12 @@ matters later.
 1. Source RClamp0574P's actual pin table (part confirmed real and
    correctly rated, just the datasheet itself — the only genuinely
    blocked item left).
-2. Wire the TMDS signal nets, add ESD protection once 1 is resolved,
-   and EDID circuitry (HPD is now wired — see above).
+2. Wire the TMDS signal nets (exact B2B pins per port now known — see
+   carrier-board-spec.md's B2B pin table — but the physical path is
+   connector → ESD protection → SOM connector, so this still wants 1
+   resolved first, or an explicit documented gap if wired ahead of it),
+   add ESD protection once 1 is resolved, and EDID circuitry (HPD and
+   the reference clocks are now wired — see above).
 3. Design `power.kicad_sch`'s VCCO regulators themselves (the sequencing
    circuit driving their EN pins is done — see above) once specific
    regulator parts are chosen.

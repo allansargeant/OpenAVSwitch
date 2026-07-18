@@ -5213,6 +5213,191 @@
 			(uuid "e2b5a642-f3e9-446b-82a5-6de236ccd711")
 		)
 	)
+	(global_label "REFCLK_IN1_P"
+		(shape input)
+		(at 111.76 330.2 0)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "b04883b6-fc76-43af-8795-e45a3fa8e4b5")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 111.76 330.2 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+	)
+	(global_label "REFCLK_IN1_N"
+		(shape input)
+		(at 111.76 327.66 0)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "012b9546-945c-4b1a-b389-3c84cf7b0b89")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 111.76 327.66 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+	)
+	(global_label "REFCLK_IN2_P"
+		(shape input)
+		(at 86.36 337.82 0)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "a75aaf18-6d31-480b-a619-2adab6f3b4db")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 86.36 337.82 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+	)
+	(global_label "REFCLK_IN2_N"
+		(shape input)
+		(at 86.36 335.28 0)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "b2bd6642-1d8f-43ee-bb35-00325bd21a64")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 86.36 335.28 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+	)
+	(global_label "REFCLK_OUT_P"
+		(shape input)
+		(at 86.36 330.2 0)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "f1b71534-5ada-4789-963d-9f584bcdcb0b")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 86.36 330.2 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+	)
+	(global_label "REFCLK_OUT_N"
+		(shape input)
+		(at 86.36 327.66 0)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "4199fb68-b6fb-4780-b6d6-4798a96f30b2")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 86.36 327.66 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+	)
+	(global_label "REFCLK_IN3_P"
+		(shape input)
+		(at 111.76 177.8 0)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "d516fb7e-f2c1-4e8f-8b2f-c60520b1c432")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 111.76 177.8 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+	)
+	(global_label "REFCLK_IN3_N"
+		(shape input)
+		(at 111.76 180.34 0)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "eac6abaa-dbca-489a-b549-07db6f10fc58")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 111.76 180.34 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+	)
+
 	(sheet_instances
 		(path "/"
 			(page "1")
