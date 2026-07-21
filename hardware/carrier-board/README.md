@@ -15,7 +15,16 @@ wired end-to-end from connector through ESD protection to the exact SOM
 connector B2B pins in all 4 HDMI sheets — TMDS_CLK routes to each
 quad's spare 4th GTH lane rather than the reference clock pins, a
 question resolved via AMD's own CDR tracking-range spec, see
-carrier-board-spec.md.**
+carrier-board-spec.md; decoupling capacitors added for TXS0102
+(VCCA/VCCB) and Si5341A (all 14 VDD/VDDA/VDDOx pins) — see below.**
+
+**Tooling change (2026-07-21): this project now edits `.kicad_sch` files
+exclusively through Konnect's MCP tools**, not hand-authored
+S-expression scripts. Konnect provides a validated schematic-editing
+API (`add_schematic_component`, `connect_pins`, `get_component_nets`,
+etc.) instead of text-editing the KiCad file format directly — safer
+in general, but it has its own real quirks, documented below since
+they cost real debugging time to find.
 Design content lives
 in [../../docs/carrier-board-spec.md](../../docs/carrier-board-spec.md) —
 read that first.
@@ -209,7 +218,100 @@ sheet, in hierarchy traversal order, to introduce the `GND`/`+3V3`
 global-label nets; `power.kicad_sch`, which also uses them, is
 traversed later) and not a real connectivity problem. Safe to ignore;
 re-check in the KiCad GUI's own ERC before trusting either way if this
-matters later.
+matters later. The same signature reappeared, now across *all four*
+HDMI sheets (each pairing that sheet's `TMDS_CLK_N` with an unrelated
+`TMDS_D*` net) after adding decoupling capacitors elsewhere in the
+project — re-verified with `trace_from_point` at both label
+coordinates in one affected sheet, confirming each sits on its own
+distinct wire with no shared point. Same tool-level false positive,
+just triggered more broadly now; not re-run through the full sheet-
+swap test a second time since the underlying signature and cause are
+already established.
+
+## Decoupling capacitors (added via Konnect, 2026-07-21)
+
+Ran Konnect's `design_review`/`audit_decoupling` tools for the first
+time on this project — found a real, previously-missed gap: **no
+decoupling capacitors existed anywhere in the design**, on either
+TXS0102 (VCCA/VCCB) or Si5341A (14 power pins: VDDA, 3×VDD,
+VDDO0-9). Fixed:
+
+- **TXS0102** (all 4 HDMI sheets): C1 (VCCA) and C2 (VCCB), 100nF,
+  each wired directly to its VCC pin and to `GND`.
+- **Si5341A** (`clocking.kicad_sch`): C3-C16, 100nF, one per VDD-family
+  pin (VDDA, VDD×3, VDDO0-9), each wired the same way.
+
+TXS0102's caps are done in **all 4 HDMI sheets** (hdmi_in1-3,
+hdmi_out), not just hdmi_in1 — same C1/C2 pattern, same verified
+approach, replicated once the technique was proven correct.
+
+**These decoupling caps still show `power_pin_not_driven` in ERC, and
+that's correct, not a bug**: a capacitor doesn't power a chip, it only
+filters noise on a rail that something else must actually drive. No
+regulator or supply source feeds `+3V3` (TXS0102's rail) or Si5341A's
+VDD-family pins anywhere in this design yet — that's the pre-existing,
+already-documented "VCCO regulator" open item below, not something
+this pass was meant to fix or something it made worse.
+
+**Real Konnect tool quirks hit while doing this, worth knowing before
+repeating this kind of work**:
+
+1. **`connect_pins` between two pins at the exact same coordinate
+   writes a zero-length wire that doesn't register in net tracing.**
+   Placing a cap so its pin lands precisely on the IC pin (the
+   "obvious" way to do it) silently produces a broken connection —
+   `get_component_nets` reports the IC pin's net as `null` afterward.
+   Fix: always place the cap with a small deliberate offset (this
+   project used 1.27mm) so `connect_pins` has to draw a real,
+   positive-length wire.
+2. **A net with no label anywhere on it reports `net: null` from
+   `get_component_nets`/`get_pin_connections`, even when the wire
+   connection is completely correct.** This looks identical to the
+   zero-length-wire bug above but isn't one — `trace_from_point` at
+   the exact pin coordinate is the reliable way to tell them apart: it
+   shows the actual wire geometry regardless of whether a label (and
+   therefore a net *name*) exists.
+3. **`move_schematic_component` does not adjust connected wires** (it
+   says so in its own description — read tool descriptions before
+   using them, not after). Moving a component after wiring it orphans
+   every wire/label that pointed at its old pin locations.
+4. **`delete_schematic_net_label` matches by `(net, x, y)` only, with
+   no way to disambiguate by UUID.** If an unrelated pre-existing
+   label happens to share the exact coordinate of one you're trying to
+   remove — which happens often here, since decoupling caps get placed
+   right next to existing power pins — it deletes whichever one
+   matches first. This genuinely deleted two legitimate, already-
+   working `+3V3` labels from Task 32 during this pass; caught only by
+   re-running `get_component_nets` afterward and noticing VCCA/VCCB
+   had gone from `"+3V3"` to `null`, then fixed by re-adding the exact
+   same labels. **Always call `list_schematic_labels` and inspect
+   before deleting by coordinate**, don't assume the coordinate is
+   uniquely yours.
+5. **`batch_connect_to_net` always creates a *local* `net_label`, with
+   no way to request a `global_label`** (unlike the single-item
+   `connect_to_net`/`add_schematic_net_label`, which both take a
+   `label_type` parameter). Since this project's convention is global
+   labels everywhere, batch-adding GND connections silently introduced
+   local labels next to existing global ones — harmless electrically
+   in most cases, but triggered a real `same_local_global_label` ERC
+   warning in `hdmi_in1.kicad_sch` where a global `GND` already
+   existed. Fixed by deleting the local labels and re-adding them
+   individually with `label_type: "global_label"`. If sheet-wide label
+   consistency matters, don't use the batch tool for labels that need
+   to be global.
+6. **A rapid sequence of failed `delete_schematic_net_label` calls
+   (13 calls, each erroring "No label named GND") left
+   `clocking.kicad_sch` truncated at EOF** — a real file corruption,
+   caught immediately because every subsequent Konnect call on that
+   file returned a parse error, and by `git diff --stat` showing 1658
+   deletions had silently landed despite no successful delete having
+   been logged. Recovered via `git checkout` since nothing was
+   committed yet. Cause not fully diagnosed (possibly a bug in how
+   that tool handles a "not found" case), but the practical lesson:
+   **commit or at least sanity-check file validity after any batch of
+   delete-by-coordinate calls**, and know that `git checkout` is the
+   reliable escape hatch if a Konnect call ever corrupts a file — this
+   project is git-tracked specifically so that's always available.
 
 ## Next steps
 
