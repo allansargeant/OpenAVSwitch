@@ -44,8 +44,20 @@ a double-buffered continuous-capture pipeline, a per-channel
 nearest-neighbor scaler, and a frame-boundary-latched seamless switch,
 all proven in Icarus Verilog simulation across 4 asynchronous,
 mismatched-resolution simulated sources — see [sim/README.md](sim/README.md).
+
+The Phase 1 **carrier-board schematic capture** is now underway in KiCad
+([hardware/carrier-board/](hardware/carrier-board/)): a Trenz TE0807
+(Zynq UltraScale+) SOM carrier with 3 native HDMI inputs + 1 native HDMI
+output. All 4 SOM connectors, HDMI connectors, DDC level translators,
+HPD circuitry, TMDS wiring through ESD protection to exact GTH B2B pins,
+the Si5341A reference-clock tree, power sequencing, and decoupling are
+placed and ERC-validated — see
+[hardware/carrier-board/README.md](hardware/carrier-board/README.md)
+for detailed status and remaining items (VCCO regulators, DDC GPIO
+pin-out, EDID firmware).
+
 Nothing has been synthesized or run on real silicon yet; no board has
-been purchased. See [docs/](docs/) for design docs and
+been fabricated. See [docs/](docs/) for design docs and
 [docs/roadmap.md](docs/roadmap.md) for the phased plan.
 
 ## Phase 1 goal
@@ -62,7 +74,7 @@ layered on. Details in [docs/phase1-plan.md](docs/phase1-plan.md) and
 Full phased plan in [docs/roadmap.md](docs/roadmap.md). At a glance:
 
 - [x] **Phase 0** — Architecture & specs
-- [ ] **Phase 1** — 4-in / 1-out HDMI 4K seamless switcher *(logic/simulation track done; carrier-board hardware not yet built, synthesized, or run on silicon)*
+- [ ] **Phase 1** — 4-in / 1-out HDMI 4K seamless switcher *(logic/simulation track done; carrier-board KiCad schematic capture in progress; nothing built, synthesized, or run on silicon yet)*
 - [ ] **Phase 2** — Multi-layer compositing
 - [ ] **Phase 3** — Modular I/O daughtercards
 - [ ] **Phase 4** — Chassis / card-cage productization
@@ -72,7 +84,8 @@ Full phased plan in [docs/roadmap.md](docs/roadmap.md). At a glance:
 ## Repo layout
 
 - `docs/` — architecture, specs, roadmap
-- `hardware/` — board/daughtercard designs (schematics, connector specs)
+- `hardware/` — board/daughtercard designs; `carrier-board/` is the live
+  Phase 1 KiCad project (see its README for schematic status)
 - `rtl/` — FPGA HDL: capture, scaler, compositor, output, common/shared
 - `sim/` — testbenches and simulation
 - `host-sw/` — Linux-side control plane and third-party card drivers (e.g. DeckLink)
